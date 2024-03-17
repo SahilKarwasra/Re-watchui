@@ -55,7 +55,7 @@ fun WelcomeScreen(
                 fontSize = 15.sp,
                 color = Color.White,
                 modifier = Modifier.clickable {
-                    navController.navigate(route = AppScreens.HomeScreen.name)
+                    navController.navigate(route = AppScreens.HomeScreen.route)
                 }
             )
         }
@@ -99,13 +99,13 @@ fun WelcomeScreen(
 
             CButton(text = "Sign In With Email",
                 onClick = {
-                    navController.navigate(route = AppScreens.LoginScreen.name)
+                    navController.navigate(route = AppScreens.LoginScreen.route)
                 }
             )
 
             DontHaveAccountRow(
                 onSignupTap = {
-                    navController.navigate(route = AppScreens.SignUpScreen.name)
+                    navController.navigate(route = AppScreens.SignUpScreen.route)
                 }
             )
 

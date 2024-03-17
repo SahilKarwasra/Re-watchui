@@ -1,5 +1,6 @@
 package com.example.re_watch.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -10,9 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,22 +28,33 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.re_watch.LoginViewModel
 import com.example.re_watch.R
+import com.example.re_watch.SignUpViewModel
 import com.example.re_watch.components.CButton
 import com.example.re_watch.components.CTextField
+import com.example.re_watch.data.LoginUIEvent
+import com.example.re_watch.data.SignUpUIEvent
 import com.example.re_watch.navigation.AppScreens
+import com.google.firebase.auth.FirebaseAuth
+
+
 
 @Composable
 fun SignUpScreen(navController: NavHostController) {
+
+    val signUpViewModel: SignUpViewModel = viewModel()
+    signUpViewModel.setNavController(navController)
+
     Surface(
         color = Color(0xFF253334),
         modifier = Modifier.fillMaxSize()
     ) {
 
-
-        Box(modifier =  Modifier.fillMaxSize()){
-            /// Background Image
+        Box(modifier = Modifier.fillMaxSize()){
+            // Background Image
             Image(painter = painterResource(id = R.drawable.background),
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
@@ -49,8 +64,7 @@ fun SignUpScreen(navController: NavHostController) {
                     .align(alignment = Alignment.BottomCenter)
             )
 
-            /// Content
-
+            // Content
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
@@ -88,16 +102,29 @@ fun SignUpScreen(navController: NavHostController) {
                 )
 
 
-                // Text Field
-                CTextField(hint = "Full Name")
 
-                CTextField(hint = "Email Address")
+                CTextField(
+                    hint = "User Name",
+                    onValueChange = {signUpViewModel.onEvent(SignUpUIEvent.UsernameChanged(it))},
+                    value = signUpViewModel.signUpUIState.value.username
+                )
 
-                CTextField(hint = "Password" , visualTransformation = PasswordVisualTransformation())
+                CTextField(
+                    hint = "Email Address",
+                    onValueChange = {signUpViewModel.onEvent(SignUpUIEvent.EmailChanged(it))},
+                    value = signUpViewModel.signUpUIState.value.email
+                )
+                CTextField(
+                    hint = "Password",
+                    onValueChange = {signUpViewModel.onEvent(SignUpUIEvent.PasswordChanged(it))},
+                    value = signUpViewModel.signUpUIState.value.password,
+                    visualTransformation = PasswordVisualTransformation()
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                CButton(text = "Sign Up")
+                CButton(text = "Sign Up", onClick = {
+                    signUpViewModel.onEvent(SignUpUIEvent.SignUpButtonClicked) })
 
                 Row(
                     modifier = Modifier.padding(top=12.dp, bottom = 52.dp)
@@ -116,16 +143,17 @@ fun SignUpScreen(navController: NavHostController) {
                             color = Color.White
                         ),
                         modifier = Modifier.clickable {
-                            navController.navigate(route = AppScreens.LoginScreen.name)
+                            navController.navigate(route = AppScreens.LoginScreen.route)
                         }
                     )
-
-
                 }
-
             }
-
+            if(signUpViewModel.signUpInProgress.value){
+                CircularProgressIndicator()
+            }
         }
 
     }
+
 }
+

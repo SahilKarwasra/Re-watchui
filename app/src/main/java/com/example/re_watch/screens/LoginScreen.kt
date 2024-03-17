@@ -19,18 +19,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.re_watch.LoginViewModel
 import com.example.re_watch.R
 import com.example.re_watch.components.CButton
 import com.example.re_watch.components.CTextField
 import com.example.re_watch.components.DontHaveAccountRow
+import com.example.re_watch.data.LoginUIEvent
 import com.example.re_watch.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavHostController,) {
+    val loginViewModel: LoginViewModel = viewModel()
+    loginViewModel.setNavController(navController)
     Surface(
         color = Color(0xFF253334),
         modifier = Modifier.fillMaxSize()
@@ -92,20 +96,28 @@ fun LoginScreen(navController: NavHostController) {
 
 
                 // Text Field
-                CTextField(hint = "Email Address")
+                CTextField(
+                    hint = "Email Address",
+                    onValueChange = {loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))},
+                    value = loginViewModel.loginUIState.value.email
+                )
+
 
                 CTextField(
                     hint = "Password",
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
+                    onValueChange = {loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it))},
+                    value = loginViewModel.loginUIState.value.password
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                CButton(text = "Sign In")
+                CButton(text = "Sign In", onClick = {
+                    loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked) })
 
                 DontHaveAccountRow(
                     onSignupTap = {
-                        navController.navigate(route = AppScreens.SignUpScreen.name)
+                        navController.navigate(route = AppScreens.SignUpScreen.route)
                     }
                 )
             }

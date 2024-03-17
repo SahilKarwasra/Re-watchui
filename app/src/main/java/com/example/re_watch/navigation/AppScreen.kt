@@ -1,23 +1,10 @@
 package com.example.re_watch.navigation
 
-enum class AppScreens {
-    WelcomeScreen,
-    LoginScreen,
-    SignUpScreen,
-    HomeScreen,
-    ProfileScreen;
-
-    companion object {
-        fun fromRoute(route: String?): AppScreens =
-            when (route?.substringBefore("/")) {
-                WelcomeScreen.name -> WelcomeScreen
-                LoginScreen.name -> LoginScreen
-                SignUpScreen.name -> SignUpScreen
-                HomeScreen.name -> HomeScreen
-                ProfileScreen.name -> ProfileScreen
-                null -> WelcomeScreen
-                else -> throw IllegalArgumentException("Route $route is not Recognised")
-            }
-    }
+sealed class AppScreens(val route: String) {
+    data object WelcomeScreen: AppScreens("welcome_screen")
+    data object LoginScreen: AppScreens("login_screen")
+    data object SignUpScreen: AppScreens("signUp_screen")
+    data object HomeScreen: AppScreens("home_screen")
+    data object ProfileScreen: AppScreens("profile_screen")
 
 }

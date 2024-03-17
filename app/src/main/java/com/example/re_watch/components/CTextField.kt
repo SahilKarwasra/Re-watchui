@@ -25,20 +25,14 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CTextField(
-
+    value: String,
+    onValueChange: (String) -> Unit,
     hint: String,
-
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
-    var valuetextfield by remember {
-        mutableStateOf("")
-    }
-
     TextField(
-        value = valuetextfield,
-        onValueChange = {
-            valuetextfield = it
-        },
+        value = value,
+        onValueChange = onValueChange,
         placeholder = {
             Text(
                 text = hint,
@@ -60,6 +54,5 @@ fun CTextField(
             focusedIndicatorColor = Color(0xFFBEC2C2),
             unfocusedIndicatorColor = Color(0xFFBEC2C2)
         )
-
     )
 }
