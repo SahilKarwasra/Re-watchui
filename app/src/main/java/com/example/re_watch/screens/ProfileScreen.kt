@@ -35,6 +35,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,6 +66,10 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,6 +125,19 @@ fun ProfileScreen(navController: NavHostController) {
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainProfileScreen(navController: NavHostController) {
+    var userName by remember { mutableStateOf("") }
+    fetchUsernameFromDatabase(
+        onSuccess = { username ->
+            // Use the username here
+            userName = username
+        },
+        onFailure = { errorMessage ->
+            // Handle the failure here
+            userName  = errorMessage
+        }
+    )
+
+
     val permissionState = rememberPermissionState(permission = Manifest.permission.READ_MEDIA_VIDEO)
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(
@@ -154,6 +175,13 @@ fun MainProfileScreen(navController: NavHostController) {
         ) {
             Text(
                 text = "${FirebaseAuth.getInstance().currentUser?.email}",
+                modifier = Modifier
+                    .background(color = Color.Black)
+                    .width(300.dp),
+                color = Color.White
+            )
+            Text(
+                text = userName,
                 modifier = Modifier
                     .background(color = Color.Black)
                     .width(300.dp),
@@ -229,4 +257,28 @@ fun MainProfileScreen(navController: NavHostController) {
         }
     }
 }
+
+fun fetchUsernameFromDatabase(onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    val user = FirebaseAuth.getInstance().currentUser
+    val userId = user?.uid ?: ""
+
+    val database = FirebaseDatabase.getInstance()
+    val usersRef = database.getReference("users")
+
+    usersRef.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            val username = snapshot.child("username").getValue(String::class.java)
+            if (username != null) {
+                onSuccess(username)
+            } else {
+                onFailure("Username not found")
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            onFailure("Failed to retrieve username: ${error.message}")
+        }
+    })
+}
+
 

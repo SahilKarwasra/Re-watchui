@@ -10,6 +10,7 @@ import com.example.re_watch.data.SignUpUIEvent
 import com.example.re_watch.data.SignUpUIState
 import com.example.re_watch.navigation.AppScreens
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class SignUpViewModel() : ViewModel() {
 
@@ -74,24 +75,35 @@ class SignUpViewModel() : ViewModel() {
     }
 
     fun createUserInFirebase(){
+        val username = signUpUIState.value.username
         val email = signUpUIState.value.email
         val password = signUpUIState.value.password
         signUpInProgress.value = true
         Log.d("tag","user ${email} is  ${password}")
-        if (email != null && email.isNotEmpty() && password != null && password.isNotEmpty()) {
-            // Call createUserWithEmailAndPassword only if email and password are not empty or null
+
+        if (email != null && email.isNotEmpty() && password != null && password.isNotEmpty() && username != null && username.isNotEmpty()) {
+
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    Log.d("tag", "inside_oncomplete")
-                    Log.d("tag", "${task.isSuccessful}")
                     signUpInProgress.value = false
                     if (task.isSuccessful) {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        val userId = user?.uid ?: ""
+
+
+                        val database = FirebaseDatabase.getInstance()
+                        val usersRef = database.getReference("users")
+                        val userDetails = hashMapOf(
+                            "username" to username,
+                        )
+                        usersRef.child(userId).setValue(userDetails)
                         navigateToHomeScreen(navController)
+                    } else {
+                        Log.d("tag", "User creation failed: ${task.exception?.message}")
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.d("tag", "inside_onfailure")
-                    Log.d("tag", "${exception.message}")
+                    Log.d("tag", "User creation failed: ${exception.message}")
                 }
         } else {
             Log.d("tag", "Email or password is empty or null")
