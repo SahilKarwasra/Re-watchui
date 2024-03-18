@@ -1,9 +1,5 @@
 package com.example.re_watch.components
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,11 +14,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -43,7 +34,7 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun VideoCard(username: String, extraText: String, videoUrl: String) {
+fun VideoCard(username: String, extraText: String, videoUrl: String, onClick: () -> Unit) {
     val context = LocalContext.current
     Card(
         modifier = Modifier
@@ -53,6 +44,7 @@ fun VideoCard(username: String, extraText: String, videoUrl: String) {
             elevation = CardDefaults.cardElevation(
                  defaultElevation = 6.dp
             ),
+        onClick = onClick
     ) {
         Column {
             Box(
@@ -89,9 +81,9 @@ fun VideoCard(username: String, extraText: String, videoUrl: String) {
 }
 
 
-@Preview(showSystemUi = true)
-@Composable
-fun VideoCardPreview() {
-    VideoCard("Apex Legend","Shroud", videoUrl = "https://firebasestorage.googleapis.com/v0/b/re-watch.appspot.com/o/videos%2F144edeec-0be4-464e-9133-212d481723ea?alt=media&token=633ad954-56e4-4a8d-baaf-c9652151d81b")
-}
+//@Preview(showSystemUi = true)
+//@Composable
+//fun VideoCardPreview() {
+//    VideoCard("Apex Legend","Shroud", videoUrl = "https://firebasestorage.googleapis.com/v0/b/re-watch.appspot.com/o/videos%2F144edeec-0be4-464e-9133-212d481723ea?alt=media&token=633ad954-56e4-4a8d-baaf-c9652151d81b")
+//}
 

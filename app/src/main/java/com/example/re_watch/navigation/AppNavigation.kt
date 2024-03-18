@@ -1,16 +1,21 @@
 package com.example.re_watch.navigation
 
+import VideoData
+import android.os.Bundle
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.re_watch.FirestoreViewModel
+import androidx.navigation.navArgument
 import com.example.re_watch.screens.HomeScreen
 import com.example.re_watch.screens.LoginScreen
 import com.example.re_watch.screens.ProfileScreen
 import com.example.re_watch.screens.SignUpScreen
+import com.example.re_watch.screens.StreamingPage
 import com.example.re_watch.screens.WelcomeScreen
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
 
 @Composable
 fun AppNavigation() {
@@ -40,7 +45,22 @@ fun AppNavigation() {
         composable(AppScreens.ProfileScreen.route) {
             ProfileScreen(navController = navController)
         }
+        composable(route = "${AppScreens.StreamingPage.route}/{videodata}",
+            arguments = listOf(
+                navArgument("videodata") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+
+            val videoData = Gson().fromJson(backStackEntry.arguments?.getString("videodata") ?: "", VideoData::class.java)
+
+
+            StreamingPage(navController = navController, param = videoData)
+        }
 
 
     }
 }
+
+

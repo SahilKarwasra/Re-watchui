@@ -6,5 +6,7 @@ sealed class AppScreens(val route: String) {
     data object SignUpScreen: AppScreens("signUp_screen")
     data object HomeScreen: AppScreens("home_screen")
     data object ProfileScreen: AppScreens("profile_screen")
+    data object StreamingPage: AppScreens("video")
+
 
 }
