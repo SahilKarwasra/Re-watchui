@@ -44,6 +44,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.re_watch.R
 
 
@@ -107,7 +108,8 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                     Icon(
                         imageVector = Icons.Outlined.Favorite,
                         contentDescription = "Like icon",
-                        modifier = Modifier.size(30.dp)
+                        modifier = Modifier
+                            .size(30.dp)
                             .clickable {
 
                             },
@@ -135,7 +137,8 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Dislike Icon",
-                        modifier = Modifier.size(30.dp)
+                        modifier = Modifier
+                            .size(30.dp)
                             .clickable {
 
                             },
@@ -157,7 +160,7 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
 @Preview(showSystemUi = true)
 @Composable
 fun StreamingPagePreview() {
-//    StreamingPage()
+//    StreamingPage(navController = rememberNavController())
 }
 
 

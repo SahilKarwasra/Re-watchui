@@ -114,8 +114,8 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
 
                         },
                         modifier = Modifier
-                            .padding(start = 120.dp, top = 90.dp)
-                            .width(100.dp),
+                            .padding(start = 90.dp, top = 90.dp)
+                            .width(140.dp),
                         colors = ButtonColors(
                             containerColor = Color.White,
                             contentColor = Color.Black,
@@ -158,7 +158,7 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
                 painter = painterResource(id = R.drawable.profilepng),
                 contentDescription = "null",
                 modifier = Modifier
-                    .padding(top = 130.dp)
+                    .padding(top = 120.dp)
                     .size(100.dp)
                     .fillMaxSize(),
                 tint = Color.Unspecified
@@ -169,7 +169,7 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
 
             },
             modifier = Modifier
-                .padding(start = 150.dp, top = 580.dp)
+                .padding(start = 120.dp, top = 575.dp)
                 .width(100.dp),
             colors = ButtonColors(
                 containerColor = Color.White,
