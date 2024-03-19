@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -107,6 +108,18 @@ fun ProfileScreen(navController: NavHostController) {
                             .size(30.dp)
                             .clickable {
                                 navController.popBackStack()
+                            }
+                    )
+                },
+                actions = {
+                    Icon(
+                        Icons.Filled.Favorite,
+                        contentDescription = "Liked Button.",
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .size(30.dp)
+                            .clickable {
+                                navController.navigate(route = AppScreens.LikedScreen.route)
                             }
                     )
                 },

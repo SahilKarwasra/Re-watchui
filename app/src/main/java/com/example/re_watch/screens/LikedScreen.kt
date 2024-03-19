@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -44,7 +46,8 @@ fun LikedScreen(navController: NavHostController) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 5.dp)
+                            .padding(start = 5.dp),
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             stringResource(id = R.string.app_name),
@@ -52,17 +55,19 @@ fun LikedScreen(navController: NavHostController) {
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
-                },
-                actions = {
                     Icon(
-                        Icons.Filled.Favorite,
-                        contentDescription = "Liked Button.",
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Go Back",
                         modifier = Modifier
                             .size(30.dp)
                             .clickable {
-
+                                navController.popBackStack()
                             }
                     )
+
+                },
+                actions = {
+
                     Icon(
                         imageVector = Icons.Rounded.Search,
                         contentDescription = "Search",

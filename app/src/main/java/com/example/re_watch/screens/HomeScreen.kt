@@ -88,7 +88,7 @@ fun HomeScreen(navController: NavHostController) {
                         modifier = Modifier
                             .size(30.dp)
                             .clickable {
-
+                                navController.navigate(route = AppScreens.LikedScreen.route)
                             }
                     )
                     Icon(
