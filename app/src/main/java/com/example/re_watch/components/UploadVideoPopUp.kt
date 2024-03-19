@@ -1,11 +1,14 @@
 package com.example.re_watch.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -33,21 +36,29 @@ fun UploadVideoPopUp() {
                 .height(433.dp)
                 .width(340.dp),
         ) {
-            Button(
-                onClick = {
+            Row {
+                Button(
+                    onClick = {
 
-                },
-                modifier = Modifier
-                    .padding(start = 120.dp, top = 140.dp)
-                    .width(100.dp),
-                colors = ButtonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black,
-                    disabledContainerColor = Color.Gray,
-                    disabledContentColor = Color.Black
+                    },
+                    modifier = Modifier
+                        .padding(start = 120.dp, top = 90.dp)
+                        .width(100.dp),
+                    colors = ButtonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.Black
+                    )
+                ) {
+                    Text(text = "Upload")
+                }
+                Icon(
+                    imageVector = Icons.Rounded.Check,
+                    contentDescription = "File Uploaded",
+                    modifier = Modifier
+                        .padding(top = 102.dp)
                 )
-            ) {
-                Text(text = "Upload")
             }
             OutlinedTextField(
                 value = "Title (required)",
@@ -75,6 +86,22 @@ fun UploadVideoPopUp() {
             .size(100.dp),
         tint = Color.Unspecified
     )
+    Button(
+        onClick = {
+
+        },
+        modifier = Modifier
+            .padding(start = 150.dp, top = 580.dp)
+            .width(100.dp),
+        colors = ButtonColors(
+            containerColor = Color.White,
+            contentColor = Color.Black,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.Black
+        )
+    ) {
+        Text(text = "Save")
+    }
 }
 
 
