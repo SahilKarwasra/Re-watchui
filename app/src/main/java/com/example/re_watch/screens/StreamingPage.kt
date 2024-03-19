@@ -152,8 +152,6 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
             }
         }
     }
-
-
 }
 
 @Preview(showSystemUi = true)
