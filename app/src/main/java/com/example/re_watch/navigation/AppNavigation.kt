@@ -1,7 +1,6 @@
 package com.example.re_watch.navigation
 
 import VideoData
-import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.re_watch.screens.HomeScreen
+import com.example.re_watch.screens.LikedScreen
 import com.example.re_watch.screens.LoginScreen
 import com.example.re_watch.screens.ProfileScreen
 import com.example.re_watch.screens.SignUpScreen
@@ -57,6 +57,9 @@ fun AppNavigation() {
 
 
             StreamingPage(navController = navController, param = videoData)
+        }
+        composable(AppScreens.LikedScreen.route) {
+            LikedScreen(navController = navController)
         }
 
 
