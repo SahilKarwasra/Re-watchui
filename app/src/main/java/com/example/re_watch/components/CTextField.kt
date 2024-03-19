@@ -8,10 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
@@ -28,7 +24,8 @@ fun CTextField(
     value: String,
     onValueChange: (String) -> Unit,
     hint: String,
-    visualTransformation: VisualTransformation = VisualTransformation.None
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardtype: KeyboardType,
 ) {
     TextField(
         value = value,
@@ -45,7 +42,7 @@ fun CTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardtype),
         visualTransformation = visualTransformation,
         colors = TextFieldDefaults.textFieldColors(
             containerColor = Color.Transparent,

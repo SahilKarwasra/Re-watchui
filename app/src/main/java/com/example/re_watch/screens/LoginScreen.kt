@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -99,7 +100,8 @@ fun LoginScreen(navController: NavHostController,) {
                 CTextField(
                     hint = "Email Address",
                     onValueChange = {loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))},
-                    value = loginViewModel.loginUIState.value.email
+                    value = loginViewModel.loginUIState.value.email,
+                    keyboardtype = KeyboardType.Email
                 )
 
 
@@ -107,7 +109,8 @@ fun LoginScreen(navController: NavHostController,) {
                     hint = "Password",
                     visualTransformation = PasswordVisualTransformation(),
                     onValueChange = {loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it))},
-                    value = loginViewModel.loginUIState.value.password
+                    value = loginViewModel.loginUIState.value.password,
+                    keyboardtype = KeyboardType.Password
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

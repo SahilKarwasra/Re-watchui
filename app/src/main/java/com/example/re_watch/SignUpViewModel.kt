@@ -59,19 +59,19 @@ class SignUpViewModel() : ViewModel() {
 
 
     private fun validateLoginUIDataWithRules(){
-//        val emailResult = Validator.validateEmail(){
-//            email = loginUIState.value.email
-//        }
-//
-//        val passwordResult = Validator.validatePassword(){
-//            password = loginUIState.value.password
-//        }
+        val usernameResult = Validator.validateUsername(signUpUIState.value.username)
 
-//        loginUIState.value = loginUIState.value.copy(
-//            emailError = emailResult.status,
-//            passwordError = passwordResult.status
-//        )
-//        allValidationPassed.value = emailResult.status && passwordResult.status
+        val emailResult = Validator.validateEmail(signUpUIState.value.email)
+
+        val passwordResult = Validator.validatePassword(signUpUIState.value.password)
+
+        signUpUIState.value = signUpUIState.value.copy(
+            emailError = emailResult,
+            passwordError = passwordResult,
+            usernameError = usernameResult
+
+        )
+        allValidationPassed.value = emailResult && passwordResult && usernameResult
     }
 
     fun createUserInFirebase(){
