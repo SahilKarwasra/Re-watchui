@@ -61,7 +61,6 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
     implementation("androidx.lifecycle:lifecycle-compiler:2.7.0")
     implementation("com.google.firebase:firebase-functions-ktx:20.4.0")
     testImplementation("junit:junit:4.13.2")
@@ -81,9 +80,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics")
     implementation ("com.google.firebase:firebase-firestore-ktx")
-
+    implementation ("com.google.firebase:firebase-auth:22.3.1")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
 
 
     //Navigation

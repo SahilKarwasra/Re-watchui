@@ -3,27 +3,22 @@ package com.example.re_watch
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.Navigation
-import androidx.navigation.compose.NavHost
 import com.example.re_watch.data.LoginUIEvent
 import com.example.re_watch.data.LoginUIState
-import com.example.re_watch.navigation.AppNavigation
 import com.example.re_watch.navigation.AppScreens
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.functions.FirebaseFunctions
-import com.google.firebase.functions.ktx.FirebaseFunctionsLegacyRegistrar
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 
 
 class LoginViewModel() : ViewModel() {
 
 
-    val functions = FirebaseFunctions.getInstance()
+    val firebaseAuth = FirebaseAuth.getInstance()
+
 
     private val TAG = LoginViewModel::class.simpleName
 
@@ -88,26 +83,17 @@ class LoginViewModel() : ViewModel() {
         FirebaseAuth
             .getInstance()
             .signInWithEmailAndPassword(email,password)
-            .addOnCompleteListener {
-                Log.d(TAG,"Inside_success_login")
-                Log.d(TAG,"${it.isSuccessful}")
-                if(it.isSuccessful){
+            .addOnCompleteListener {task ->
+                if(task.isSuccessful){
                     loginInProgress.value  = true
                     navigateToHomeScreen(navController)
-
+                }
+                else{
+                    loginInProgress.value = false
+                    handleLoginFailure(task.exception,email)
+                    task.exception?.let { Log.e(TAG, it.toString()) }
                 }
             }
-            .addOnFailureListener {
-                loginInProgress.value = false
-                Toast.makeText(
-                    context,
-                    it.message,
-                    Toast.LENGTH_LONG)
-                    .show()
-                Log.d(TAG,"Inside_failure_login")
-                it.message?.let { it1 -> Log.d(TAG, it1) }
-            }
-
 
     }
 
@@ -126,7 +112,38 @@ class LoginViewModel() : ViewModel() {
         }
     }
 
+    fun handleLoginFailure(exception: Exception?, email: String) {
+        if (exception is FirebaseAuthInvalidCredentialsException) {
+                val message = "Invalid Credentials"
+                Toast.makeText(
+                    context,
+                    message,
+                    Toast.LENGTH_LONG
+                ).show()
 
+        } else {
+            // Handle other types of exceptions
+            val message = "An error occurred"
+            Toast.makeText(
+                context,
+                message,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+
+    fun showSignupSuggestion() {
+
+        val message = "This email is not registered. Would you like to sign up?"
+
+        Toast.makeText(
+            context,
+            message,
+            Toast.LENGTH_LONG
+        ).show()
+
+    }
 
 
 
