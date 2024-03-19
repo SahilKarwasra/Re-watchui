@@ -4,9 +4,11 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,10 +47,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -56,6 +60,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.re_watch.LoginViewModel
 import com.example.re_watch.R
 import com.example.re_watch.VideoPickerViewModel
@@ -72,6 +77,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavHostController) {
@@ -122,6 +128,7 @@ fun ProfileScreen(navController: NavHostController) {
 
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainProfileScreen(navController: NavHostController) {
@@ -155,6 +162,7 @@ fun MainProfileScreen(navController: NavHostController) {
         }
     )
 
+    val email = FirebaseAuth.getInstance().currentUser?.email
     val context = LocalContext.current
     val viewModelvideo: VideoPickerViewModel = viewModel()
     val launcher = rememberLauncherForActivityResult(
@@ -170,50 +178,29 @@ fun MainProfileScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "${FirebaseAuth.getInstance().currentUser?.email}",
+            Icon(
+                painter = painterResource(id = R.drawable.profilepng),
+                contentDescription = "Profile Pic",
                 modifier = Modifier
-                    .background(color = Color.Black)
-                    .width(300.dp),
-                color = Color.White
+                    .padding(start = 140.dp, top = 20.dp)
+                    .size(100.dp),
+                tint = Color.Unspecified
             )
             Text(
-                text = userName,
+                text = "Email: $email",
                 modifier = Modifier
-                    .background(color = Color.Black)
-                    .width(300.dp),
-                color = Color.White
+                    .width(300.dp)
+                    .padding(top = 50.dp, bottom = 10.dp, start = 80.dp),
+                color = Color.Black
             )
-            Button(
-                onClick = {
-                    FirebaseAuth.getInstance().signOut()
-                    navController.popBackStack(AppScreens.HomeScreen.route, inclusive = true)
-                    navController.popBackStack(AppScreens.ProfileScreen.route, inclusive = true)
-                    navController.navigate(route = AppScreens.WelcomeScreen.route)
-
-                          },
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4372F1)
-                ),
+            Text(
+                text = "Username: $userName",
                 modifier = Modifier
-                    .width(100.dp)
-                    .height(52.dp)
-            ) {
-
-                Text(
-                    text = "SignOut",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight(500),
-                        color = Color.White
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.padding(bottom = 20.dp))
+                    .width(300.dp)
+                    .padding(top = 20.dp, bottom = 20.dp, start = 80.dp),
+                color = Color.Black
+            )
             Button(
                 onClick = {
                     if(permissionState.status.isGranted){
@@ -234,13 +221,14 @@ fun MainProfileScreen(navController: NavHostController) {
                             .show()
                     }
 
-                    
+
                 },
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF4372F1)
                 ),
                 modifier = Modifier
+                    .padding(start = 140.dp , top = 50.dp)
                     .width(100.dp)
                     .height(52.dp)
             ) {
@@ -254,6 +242,36 @@ fun MainProfileScreen(navController: NavHostController) {
                     )
                 )
             }
+
+            Spacer(modifier = Modifier.padding(bottom = 20.dp))
+            Button(
+                onClick = {
+                    FirebaseAuth.getInstance().signOut()
+                    navController.popBackStack(AppScreens.HomeScreen.route, inclusive = true)
+                    navController.popBackStack(AppScreens.ProfileScreen.route, inclusive = true)
+                    navController.navigate(route = AppScreens.WelcomeScreen.route)
+
+                },
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4372F1)
+                ),
+                modifier = Modifier
+                    .padding(start = 140.dp , top = 20.dp)
+                    .width(100.dp)
+                    .height(52.dp)
+            ) {
+
+                Text(
+                    text = "SignOut",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight(500),
+                        color = Color.White
+                    )
+                )
+            }
+
         }
     }
 }
@@ -281,4 +299,9 @@ fun fetchUsernameFromDatabase(onSuccess: (String) -> Unit, onFailure: (String) -
     })
 }
 
-
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Preview
+@Composable
+fun ProfileScreenPreview() {
+    ProfileScreen(navController = rememberNavController())
+}

@@ -4,16 +4,20 @@ import VideoData
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +46,7 @@ import com.example.re_watch.components.VideoCard
 import com.example.re_watch.navigation.AppScreens
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,9 +83,23 @@ fun HomeScreen(navController: NavHostController) {
                 },
                 actions = {
                     Icon(
+                        Icons.Filled.Favorite,
+                        contentDescription = "Liked Button.",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clickable {
+
+                            }
+                    )
+                    Icon(
                         imageVector = Icons.Rounded.Search,
                         contentDescription = "Search",
-                        Modifier.size(30.dp)
+                        Modifier
+                            .padding(end = 20.dp , start = 20.dp)
+                            .size(30.dp)
+                            .clickable {
+
+                            }
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -144,8 +163,10 @@ fun FloatingProfileButton(onClick: () -> Unit) {
     }
 }
 
+
+
 @Preview(showSystemUi = true)
 @Composable
 fun VideoCardPreview() {
-//    HomeScreen(navController = NavHostController(LocalContext.current),)
+    HomeScreen(navController = rememberNavController())
 }
