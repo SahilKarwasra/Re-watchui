@@ -53,12 +53,12 @@ class SignUpViewModel() : ViewModel() {
 
             }
         }
-        validateLoginUIDataWithRules()
+        validateSignupUIDataWithRules()
     }
 
 
 
-    private fun validateLoginUIDataWithRules(){
+    private fun validateSignupUIDataWithRules(){
         val usernameResult = Validator.validateUsername(signUpUIState.value.username)
 
         val emailResult = Validator.validateEmail(signUpUIState.value.email)

@@ -1,5 +1,6 @@
 package com.example.re_watch.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -35,7 +37,7 @@ import com.example.re_watch.navigation.AppScreens
 @Composable
 fun LoginScreen(navController: NavHostController,) {
     val loginViewModel: LoginViewModel = viewModel()
-    loginViewModel.setNavController(navController)
+    loginViewModel.setNavController(navController, LocalContext.current)
     Surface(
         color = Color(0xFF253334),
         modifier = Modifier.fillMaxSize()
@@ -116,7 +118,18 @@ fun LoginScreen(navController: NavHostController,) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 CButton(text = "Sign In", onClick = {
-                    loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked) })
+                    if(loginViewModel.allValidationPassed.value){
+                        loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
+                    }
+                    else{
+                        if(!loginViewModel.loginUIState.value.emailError){
+                            Log.d("error","check email")
+                        }
+                        if(!loginViewModel.loginUIState.value.passwordError){
+                            Log.d("error","check password")
+                        }
+                    }
+                    })
 
                 DontHaveAccountRow(
                     onSignupTap = {
