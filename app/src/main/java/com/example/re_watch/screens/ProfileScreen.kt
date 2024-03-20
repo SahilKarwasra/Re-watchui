@@ -46,10 +46,6 @@ import com.example.re_watch.R
 import com.example.re_watch.components.UploadVideoPopUp
 import com.example.re_watch.navigation.AppScreens
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,17 +102,8 @@ fun ProfileScreen(navController: NavHostController) {
 @Composable
 fun MainProfileScreen(navController: NavHostController) {
     var dialogVisible by remember { mutableStateOf(false) }
-    var userName by remember { mutableStateOf("") }
-    fetchUsernameFromDatabase(
-        onSuccess = { username ->
-            // Use the username here
-            userName = username
-        },
-        onFailure = { errorMessage ->
-            // Handle the failure here
-            userName  = errorMessage
-        }
-    )
+
+
 
     Surface() {
         Column(
@@ -133,13 +120,15 @@ fun MainProfileScreen(navController: NavHostController) {
                     .width(300.dp),
                 color = Color.White
             )
-            Text(
-                text = userName,
-                modifier = Modifier
-                    .background(color = Color.Black)
-                    .width(300.dp),
-                color = Color.White
-            )
+            FirebaseAuth.getInstance().currentUser?.displayName?.let {
+                Text(
+                    text = it,
+                    modifier = Modifier
+                        .background(color = Color.Black)
+                        .width(300.dp),
+                    color = Color.White
+                )
+            }
             Button(
                 onClick = {
                     FirebaseAuth.getInstance().signOut()
@@ -196,27 +185,45 @@ fun MainProfileScreen(navController: NavHostController) {
     }
 }
 
-fun fetchUsernameFromDatabase(onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-    val user = FirebaseAuth.getInstance().currentUser
-    val userId = user?.uid ?: ""
+//fun fetchUsernameFromDatabase(onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+//    val user = FirebaseAuth.getInstance().currentUser
+//    val userId = user?.uid ?: ""
+//
+//    val database = FirebaseDatabase.getInstance()
+//    val usersRef = database.getReference("users")
+//
+//    usersRef.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+//        override fun onDataChange(snapshot: DataSnapshot) {
+//            val username = snapshot.child("username").getValue(String::class.java)
+//            if (username != null) {
+//                onSuccess(username)
+//            } else {
+//                onFailure("Username not found")
+//            }
+//        }
+//
+//        override fun onCancelled(error: DatabaseError) {
+//            onFailure("Failed to retrieve username: ${error.message}")
+//        }
+//    })
+//}
+//
 
-    val database = FirebaseDatabase.getInstance()
-    val usersRef = database.getReference("users")
 
-    usersRef.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
-        override fun onDataChange(snapshot: DataSnapshot) {
-            val username = snapshot.child("username").getValue(String::class.java)
-            if (username != null) {
-                onSuccess(username)
-            } else {
-                onFailure("Username not found")
-            }
-        }
+//val user = FirebaseAuth.getInstance().currentUser
+//val userId = user?.uid ?: ""
+//val  photoUrl
+//val profileUpdates = UserProfileChangeRequest.Builder()
+//    .setPhotoUri(Uri.parse(photoUrl))
+//    .build()
 
-        override fun onCancelled(error: DatabaseError) {
-            onFailure("Failed to retrieve username: ${error.message}")
-        }
-    })
-}
-
-
+//user?.updateProfile(profileUpdates)
+//?.addOnCompleteListener { profileTask ->
+//    if (profileTask.isSuccessful) {
+//
+//        val updatedUser = FirebaseAuth.getInstance().currentUser
+//        val updatedDisplayName = updatedUser?.displayName
+//
+//    } else {
+//    }
+//}

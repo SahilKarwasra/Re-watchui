@@ -2,7 +2,6 @@ package com.example.re_watch.screens
 
 import VideoData
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -42,15 +41,18 @@ import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.re_watch.R
 
 
 @Composable
 fun StreamingPage(navController: NavHostController, param: VideoData?) {
-    val uploadtime = param?.uploadTime
+    val title = param?.videoTitle
+    val description = param?.videoDescription
+    val displayName = param?.userDisplayName
+    val userPhoto = param?.userPhoto
+    val userProfileUrl = param?.userProfileUrl
+    val uploadTime = param?.uploadTime
     val uri = param?.videoUrl?.toUri()
     Column {
         Surface(
@@ -77,14 +79,16 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
             Column(
                 modifier = Modifier.padding(start = 7.dp, top = 10.dp),
             ) {
-                Text(
-                    text = "Valorant Best Kills, highlights from my Stream",
-                    modifier = Modifier.padding(bottom = 5.dp),
-                    maxLines = 2,
-                    fontWeight = FontWeight(400),
-                    fontSize = 16.sp
-                )
-                uploadtime?.let {
+                title?.let {
+                    Text(
+                        text = it,
+                        modifier = Modifier.padding(bottom = 5.dp),
+                        maxLines = 2,
+                        fontWeight = FontWeight(400),
+                        fontSize = 16.sp
+                    )
+                }
+                displayName?.let {
                     Text(
                         text = it, maxLines = 1, fontWeight = FontWeight(300), fontSize = 16.sp
                     )

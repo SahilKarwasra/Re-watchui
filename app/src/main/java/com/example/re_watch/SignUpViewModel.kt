@@ -1,7 +1,6 @@
 package com.example.re_watch
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
@@ -10,7 +9,7 @@ import com.example.re_watch.data.SignUpUIEvent
 import com.example.re_watch.data.SignUpUIState
 import com.example.re_watch.navigation.AppScreens
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.auth.UserProfileChangeRequest
 
 class SignUpViewModel() : ViewModel() {
 
@@ -88,15 +87,11 @@ class SignUpViewModel() : ViewModel() {
                     signUpInProgress.value = false
                     if (task.isSuccessful) {
                         val user = FirebaseAuth.getInstance().currentUser
-                        val userId = user?.uid ?: ""
+                        val displayName = username
+                        val profileUpdates = UserProfileChangeRequest.Builder()
+                            .setDisplayName(displayName)
+                            .build()
 
-
-                        val database = FirebaseDatabase.getInstance()
-                        val usersRef = database.getReference("users")
-                        val userDetails = hashMapOf(
-                            "username" to username,
-                        )
-                        usersRef.child(userId).setValue(userDetails)
                         navigateToHomeScreen(navController)
                     } else {
                         Log.d("tag", "User creation failed: ${task.exception?.message}")
@@ -127,7 +122,12 @@ class SignUpViewModel() : ViewModel() {
         }
     }
 
-
+//    val database = FirebaseDatabase.getInstance()
+//    val usersRef = database.getReference("users")
+//    val userDetails = hashMapOf(
+//        "username" to username,
+//    )
+//    usersRef.child(userId).setValue(userDetails)
 
 
 

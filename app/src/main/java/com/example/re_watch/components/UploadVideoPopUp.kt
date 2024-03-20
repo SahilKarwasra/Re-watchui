@@ -30,14 +30,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.re_watch.R
 import com.example.re_watch.VideoPickerViewModel
+import com.example.re_watch.data.UploadUIEvent
 import com.example.re_watch.isPermanentlyDenied
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -67,16 +70,20 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
             }
         }
     )
+
+
     val context = LocalContext.current
     val viewModelvideo: VideoPickerViewModel = viewModel()
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             uri?.let {
-                viewModelvideo.onVideoSelected(context ,uri)
+                viewModelvideo.onVideoSelect(context)
+                viewModelvideo.onEvent(UploadUIEvent.VideoUriChanged(it.toString()))
             }
         }
     )
+
     Dialog(onDismissRequest = onDismiss) {
 
 
@@ -133,20 +140,39 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
                     )
                 }
                 OutlinedTextField(
-                    value = "Title (required)",
+                    value = viewModelvideo.uploadUIState.value.title,
                     onValueChange = {
-
+                        viewModelvideo.onEvent(UploadUIEvent.TitleChanged(it))
                     },
-                    modifier = Modifier.padding(top = 25.dp, start = 30.dp)
+                    modifier = Modifier.padding(top = 25.dp, start = 30.dp),
+                    placeholder = {
+                        Text(
+                            text = "Title (required)",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                color = Color(0xFF262727)
+                            )
+                        )
+                    },
+
                 )
                 OutlinedTextField(
-                    value = "Description",
+                    value = viewModelvideo.uploadUIState.value.description,
                     onValueChange = {
-
+                        viewModelvideo.onEvent(UploadUIEvent.DescriptionChanged(it))
                     },
                     modifier = Modifier
                         .padding(top = 30.dp, start = 30.dp)
-                        .height(120.dp)
+                        .height(120.dp),
+                    placeholder = {
+                        Text(
+                            text = "Description",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                color = Color(0xFF262727)
+                            )
+                        )
+                    },
                 )
             }
         }
@@ -166,6 +192,7 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
         }
         Button(
             onClick = {
+                viewModelvideo.onEvent(UploadUIEvent.UploadButtonClicked)
 
             },
             modifier = Modifier

@@ -1,20 +1,24 @@
 package com.example.re_watch
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 data class Video(
     val userId: String,
     val userEmail: String,
     val userDisplayName: String,
-    val uploadTime: String, // Change this to Date type
-    val videoUrl: String
+    val uploadTime: String,
+    val videoUrl: String,
+    val videoTitle: String,
+    val videoDescription: String,
+    val userProfileUrl: String,
+    val userPhotoUrl : String,
 )
 
 class FirestoreViewModel : ViewModel() {
@@ -36,8 +40,13 @@ class FirestoreViewModel : ViewModel() {
                     val uploadTimeTimestamp = document.getTimestamp("uploadTime") ?: Timestamp.now()
                     val uploadTime = convertTimestampToDate(uploadTimeTimestamp)
                     val videoUrl = document.getString("videoUrl") ?: ""
+                    val videoTitle = document.getString("title") ?: ""
+                    val userProfileUrl = document.getString("userProfileUrl") ?: ""
+                    val userPhotoUrl = document.getString("userPhotoUrl") ?: ""
+                    val videoDescription = document.getString("description") ?: ""
 
-                    val video = Video(userId, userEmail, userDisplayName, uploadTime, videoUrl)
+
+                    val video = Video(userId, userEmail, userDisplayName, uploadTime, videoUrl,videoTitle,userProfileUrl,userPhotoUrl,videoDescription)
                     videoLists.add(video)
                 }
                 _videoList.value = videoLists // Update the LiveData with the fetched videoList
