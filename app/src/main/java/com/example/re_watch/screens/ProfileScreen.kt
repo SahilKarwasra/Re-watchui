@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -90,7 +91,6 @@ fun ProfileScreen(navController: NavHostController) {
         },
     ) {
         Surface(modifier = Modifier.padding(it)) {
-
             MainProfileScreen(navController)
         }
     }
@@ -110,52 +110,38 @@ fun MainProfileScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "${FirebaseAuth.getInstance().currentUser?.email}",
+            Icon(
+                painter = painterResource(id = R.drawable.profilepng),
+                contentDescription = "Profile pic",
+                tint = Color.Unspecified,
                 modifier = Modifier
-                    .background(color = Color.Black)
+                    .padding(top = 40.dp, bottom = 20.dp)
+                    .size(100.dp)
+                    .clickable {
+
+                    }
+            )
+            Text(
+                text = "Email: ${FirebaseAuth.getInstance().currentUser?.email}",
+                modifier = Modifier
+                    .padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
                     .width(300.dp),
-                color = Color.White
+                color = Color.DarkGray,
+                fontSize = 18.sp
             )
             FirebaseAuth.getInstance().currentUser?.displayName?.let {
                 Text(
-                    text = it,
+                    text = "Username: $it",
                     modifier = Modifier
-                        .background(color = Color.Black)
+                        .padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
                         .width(300.dp),
-                    color = Color.White
+                    color = Color.DarkGray,
+                    fontSize = 18.sp
                 )
             }
-            Button(
-                onClick = {
-                    FirebaseAuth.getInstance().signOut()
-                    navController.popBackStack(AppScreens.HomeScreen.route, inclusive = true)
-                    navController.popBackStack(AppScreens.ProfileScreen.route, inclusive = true)
-                    navController.navigate(route = AppScreens.WelcomeScreen.route)
-
-                          },
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4372F1)
-                ),
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(52.dp)
-            ) {
-
-                Text(
-                    text = "SignOut",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight(500),
-                        color = Color.White
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.padding(bottom = 20.dp))
+            
             Button(
                 onClick = {
                     dialogVisible = true
@@ -165,12 +151,55 @@ fun MainProfileScreen(navController: NavHostController) {
                     containerColor = Color(0xFF4372F1)
                 ),
                 modifier = Modifier
+                    .padding(top = 20.dp, bottom = 5.dp)
                     .width(100.dp)
                     .height(52.dp)
             ) {
 
                 Text(
                     text = "Upload Video",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight(500),
+                        color = Color.White
+                    )
+                )
+            }
+            
+            Button(
+                onClick = { /*TODO*/ },
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4372F1)
+                ),
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 5.dp)
+                    .width(100.dp)
+                    .height(52.dp)
+            ) {
+                Text(text = "Remove Videos")
+            }
+            
+            Button(
+                onClick = {
+                    FirebaseAuth.getInstance().signOut()
+                    navController.popBackStack(AppScreens.HomeScreen.route, inclusive = true)
+                    navController.popBackStack(AppScreens.ProfileScreen.route, inclusive = true)
+                    navController.navigate(route = AppScreens.WelcomeScreen.route)
+
+                },
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4372F1)
+                ),
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 5.dp)
+                    .width(100.dp)
+                    .height(52.dp)
+            ) {
+
+                Text(
+                    text = "SignOut",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight(500),
