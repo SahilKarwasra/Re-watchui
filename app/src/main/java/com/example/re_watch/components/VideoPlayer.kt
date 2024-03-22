@@ -236,17 +236,18 @@ fun BottomControls(
     val buffer = remember(bufferPercentage()) { bufferPercentage() }
 
     Row(modifier = modifier.padding(bottom = 5.dp)) {
-        Text(
-            modifier = Modifier.padding(start = 5.dp, top = 16.dp),
-            text = videoTime.formatMinSec(),
-            color = Color.LightGray
-        )
+
         Box(modifier = Modifier) {
+            Text(
+                modifier = Modifier.padding(start = 10.dp, top = 16.dp),
+                text = videoTime.formatMinSec(),
+                color = Color.White
+            )
             // buffer bar
             Slider(
                 modifier= Modifier
                     .align(Alignment.Center)
-                    .padding(start = 10.dp, end = 50.dp),
+                    .padding(start = 50.dp, end = 50.dp),
                 value = buffer.toFloat(),
                 enabled = false,
                 onValueChange = { /*do nothing*/},
@@ -262,7 +263,7 @@ fun BottomControls(
             Slider(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .padding(start = 10.dp, end = 50.dp),
+                    .padding(start = 50.dp, end = 50.dp),
                 value = videoTime.toFloat(),
                 onValueChange = onSeekChanged,
                 valueRange = 0f..duration.toFloat(),
@@ -275,10 +276,10 @@ fun BottomControls(
 
             Text(
                 modifier = Modifier
-                    .padding(end = 5.dp)
-                    .align(Alignment.BottomEnd),
+                    .padding(end = 10.dp)
+                    .align(Alignment.CenterEnd),
                 text = duration.formatMinSec(),
-                color = Color.LightGray
+                color = Color.White
             )
         }
 
