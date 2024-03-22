@@ -101,7 +101,9 @@ dependencies {
 
     //exoplayer
     implementation ("com.google.android.exoplayer:exoplayer:2.19.1")
-    implementation("androidx.media3:media3-exoplayer:1.3.0")
-    implementation("androidx.media3:media3-ui:1.3.0")
+    implementation ("com.google.android.exoplayer:exoplayer-core:2.19.1")
+    implementation ("com.google.android.exoplayer:exoplayer-ui:2.19.1")
+
+
 
 }

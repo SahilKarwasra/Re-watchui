@@ -1,5 +1,6 @@
 package com.example.re_watch
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import java.util.Date
 import java.util.Locale
 
 data class Video(
+    val videoId: String,
     val userId: String,
     val userEmail: String,
     val userDisplayName: String,
@@ -23,6 +25,7 @@ data class Video(
 
 class FirestoreViewModel : ViewModel() {
 
+
     private val _videoList = MutableLiveData<List<Video>>()
     val videoList: LiveData<List<Video>> = _videoList
 
@@ -34,6 +37,7 @@ class FirestoreViewModel : ViewModel() {
             .addOnSuccessListener { result ->
                 val videoLists = mutableListOf<Video>()
                 for (document in result) {
+                    val videoId = document.id
                     val userId = document.getString("userId") ?: ""
                     val userEmail = document.getString("userEmail") ?: ""
                     val userDisplayName = document.getString("userDisplayName") ?: ""
@@ -46,13 +50,13 @@ class FirestoreViewModel : ViewModel() {
                     val videoDescription = document.getString("description") ?: ""
 
 
-                    val video = Video(userId, userEmail, userDisplayName, uploadTime, videoUrl,videoTitle,userProfileUrl,userPhotoUrl,videoDescription)
+                    val video = Video(videoId,userId, userEmail, userDisplayName, uploadTime, videoUrl,videoTitle,userProfileUrl,userPhotoUrl,videoDescription)
                     videoLists.add(video)
                 }
-                _videoList.value = videoLists // Update the LiveData with the fetched videoList
+                _videoList.value = videoLists
             }
             .addOnFailureListener { exception ->
-                // Handle failure
+                Log.e("error" ,"${exception.message} error")
             }
     }
 
@@ -61,6 +65,10 @@ class FirestoreViewModel : ViewModel() {
         val date = Date(timestamp.seconds * 1000L + timestamp.nanoseconds / 1000000)
         return sdf.format(date)
     }
+
+
+
+
 }
 
 

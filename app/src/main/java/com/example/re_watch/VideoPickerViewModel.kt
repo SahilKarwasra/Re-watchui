@@ -72,7 +72,7 @@ class VideoPickerViewModel : ViewModel() {
         val description = uploadUIState.value.description
         val uri = Uri.parse(uploadUIState.value.videoUri)
         val photoUrl = FirebaseAuth.getInstance().currentUser?.photoUrl
-        val userProfileUrl = "https://re-watch.com/${FirebaseAuth.getInstance().currentUser?.displayName}"
+        val userProfileUrl = FirebaseAuth.getInstance().currentUser?.displayName?:"null"
 
         val storageReference = FirebaseStorage.getInstance().reference
         val videoRef: StorageReference = storageReference.child("videos/${UUID.randomUUID()}")

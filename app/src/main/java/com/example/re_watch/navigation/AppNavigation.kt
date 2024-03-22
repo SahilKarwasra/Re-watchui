@@ -45,15 +45,15 @@ fun AppNavigation() {
         composable(AppScreens.ProfileScreen.route) {
             ProfileScreen(navController = navController)
         }
-        composable(route = "${AppScreens.StreamingPage.route}/{videodata}",
+        composable(route = "${AppScreens.StreamingPage.route}/{videoDataJson}",
             arguments = listOf(
-                navArgument("videodata") {
+                navArgument("videoDataJson") {
                     type = NavType.StringType
                 }
             )
         ) { backStackEntry ->
 
-            val videoData = Gson().fromJson(backStackEntry.arguments?.getString("videodata") ?: "", VideoData::class.java)
+            val videoData = Gson().fromJson(backStackEntry.arguments?.getString("videoDataJson") ?: "", VideoData::class.java)
 
 
             StreamingPage(navController = navController, param = videoData)

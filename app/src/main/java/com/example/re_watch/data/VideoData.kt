@@ -1,4 +1,5 @@
 data class VideoData(
+    val videoId: String,
     val userDisplayName: String,
     val uploadTime: String,
     val videoTitle: String,
