@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -129,6 +131,16 @@ fun InputCommentTextField() {
             value = "Comment",
             onValueChange = {},
             modifier = Modifier.padding(top = 5.dp)
+                .width(270.dp)
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.Send,
+            contentDescription = "Post Comment",
+            modifier = Modifier.padding(start = 5.dp, top = 18.dp)
+                .size(30.dp)
+                .clickable {
+
+                }
         )
     }
 }
