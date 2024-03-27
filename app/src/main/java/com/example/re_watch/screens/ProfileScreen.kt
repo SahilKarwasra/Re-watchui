@@ -5,8 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -97,13 +99,9 @@ fun ProfileScreen(navController: NavHostController) {
 }
 
 
-
-
 @Composable
 fun MainProfileScreen(navController: NavHostController) {
     var dialogVisible by remember { mutableStateOf(false) }
-
-
 
     Surface() {
         Column(
@@ -112,17 +110,25 @@ fun MainProfileScreen(navController: NavHostController) {
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.profilepng),
-                contentDescription = "Profile pic",
-                tint = Color.Unspecified,
+            Surface(
                 modifier = Modifier
-                    .padding(top = 40.dp, bottom = 20.dp)
-                    .size(100.dp)
-                    .clickable {
-
-                    }
-            )
+                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(CornerSize(20.dp))),
+                color = Color(0xFF31A5DA)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.profilepng),
+                    contentDescription = "Profile pic",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .padding(top = 20.dp, bottom = 20.dp)
+                        .size(100.dp)
+                        .clickable {
+                            
+                        }
+                )
+            }
             Text(
                 text = "Email: ${FirebaseAuth.getInstance().currentUser?.email}",
                 modifier = Modifier
@@ -141,72 +147,108 @@ fun MainProfileScreen(navController: NavHostController) {
                     fontSize = 18.sp
                 )
             }
-            
-            Button(
-                onClick = {
-                    dialogVisible = true
-                },
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4372F1)
-                ),
-                modifier = Modifier
-                    .padding(top = 20.dp, bottom = 5.dp)
-                    .width(100.dp)
-                    .height(52.dp)
-            ) {
 
-                Text(
-                    text = "Upload Video",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight(500),
-                        color = Color.White
-                    )
-                )
-            }
-            
-            Button(
-                onClick = { /*TODO*/ },
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4372F1)
-                ),
+            Surface(
                 modifier = Modifier
-                    .padding(top = 20.dp, bottom = 5.dp)
-                    .width(100.dp)
-                    .height(52.dp)
+                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(CornerSize(20.dp))),
+                color = Color(0xFF31A5DA)
             ) {
-                Text(text = "Remove Videos")
-            }
-            
-            Button(
-                onClick = {
-                    FirebaseAuth.getInstance().signOut()
-                    navController.popBackStack(AppScreens.HomeScreen.route, inclusive = true)
-                    navController.popBackStack(AppScreens.ProfileScreen.route, inclusive = true)
-                    navController.navigate(route = AppScreens.WelcomeScreen.route)
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column {
+                        Button(
+                            onClick = {
+                                dialogVisible = true
+                            },
+                            shape = MaterialTheme.shapes.large,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4372F1)
+                            ),
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 5.dp)
+                                .width(100.dp)
+                                .height(52.dp)
+                        ) {
+                            Text(
+                                text = "Upload Video",
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight(500),
+                                    color = Color.White
+                                )
+                            )
+                        }
+                        Button(
+                            onClick = { /*TODO*/ },
+                            shape = MaterialTheme.shapes.large,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4372F1)
+                            ),
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 5.dp)
+                                .width(100.dp)
+                                .height(52.dp)
+                        ) {
+                            Text(text = "Remove Videos")
+                        }
+                        Button(
+                            onClick = {
 
-                },
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4372F1)
-                ),
-                modifier = Modifier
-                    .padding(top = 20.dp, bottom = 5.dp)
-                    .width(100.dp)
-                    .height(52.dp)
-            ) {
+                            },
+                            shape = MaterialTheme.shapes.large,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4372F1)
+                            ),
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 5.dp)
+                                .width(100.dp)
+                                .height(52.dp)
+                        ) {
+                            Text(
+                                text = "Edit Profile"
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                FirebaseAuth.getInstance().signOut()
+                                navController.popBackStack(
+                                    AppScreens.HomeScreen.route,
+                                    inclusive = true
+                                )
+                                navController.popBackStack(
+                                    AppScreens.ProfileScreen.route,
+                                    inclusive = true
+                                )
+                                navController.navigate(route = AppScreens.WelcomeScreen.route)
 
-                Text(
-                    text = "SignOut",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight(500),
-                        color = Color.White
-                    )
-                )
+                            },
+                            shape = MaterialTheme.shapes.large,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4372F1)
+                            ),
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 20.dp)
+                                .width(100.dp)
+                                .height(52.dp)
+                        ) {
+
+                            Text(
+                                text = "SignOut",
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight(500),
+                                    color = Color.White
+                                )
+                            )
+                        }
+
+                    }
+                }
             }
+
             if (dialogVisible) {
                 UploadVideoPopUp(onDismiss = { dialogVisible = false })
             }

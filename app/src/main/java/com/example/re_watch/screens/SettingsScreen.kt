@@ -6,14 +6,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -68,7 +73,7 @@ fun SettingsScreen() {
                     titleContentColor = Color(0xFFFFFFFF),
                     actionIconContentColor = Color(0xFFFCFCFC)
                 ),
-                )
+            )
         }
     ) {
         Surface(
@@ -88,7 +93,7 @@ fun SettingsScreen() {
                 Text(
                     text = "User Info",
                     modifier = Modifier
-                        .padding(top = 30.dp, bottom = 10.dp , start = 50.dp),
+                        .padding(top = 30.dp, bottom = 10.dp, start = 50.dp),
                     fontSize = 26.sp,
                     color = Color.Gray
                 )
@@ -108,6 +113,21 @@ fun SettingsScreen() {
                         Text(text = "User Email")
                     }
                 )
+                Button(
+                    onClick = { /*TODO*/ },
+                    shape = MaterialTheme.shapes.large,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4372F1)
+                    ),
+                    modifier = Modifier
+                        .padding(bottom = 30.dp, top = 20.dp, start = 130.dp)
+                        .width(120.dp)
+                        .height(60.dp)
+                ) {
+                    Text(
+                        text = "Change Password"
+                    )
+                }
             }
         }
     }
