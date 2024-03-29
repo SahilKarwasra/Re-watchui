@@ -18,21 +18,25 @@ import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.re_watch.CommentViewModel
 import com.example.re_watch.R
+import com.example.re_watch.data.Comment
+import com.example.re_watch.data.CommentUIEvent
 
 @Composable
 fun CommentSection() {
@@ -105,20 +109,32 @@ data class CommentItem(
 )
 
 @Composable
-fun CommentSectionPopUp(comments: List<CommentItem>) {
-    Column {
-        InputCommentTextField()
-        LazyColumn {
-            items(comments) { commentItem ->
-                CommentItemRow(commentItem)
+fun CommentSectionPopUp(commentViewModel: CommentViewModel) {
+    LaunchedEffect(Unit) {
+        commentViewModel.fetchComments()
+    }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+        LazyColumn(modifier = Modifier.padding(bottom = 90.dp, top = 10.dp)){
+            items(commentViewModel.commentUIState.value.comments) { comment ->
+
+                CommentItemRow(comment)
             }
         }
+
+        InputCommentTextField( modifier = Modifier.padding(16.dp),commentViewModel)
     }
+
+
+
 }
 
 @Composable
-fun InputCommentTextField() {
-    Row {
+fun InputCommentTextField(
+    modifier: Modifier,
+    viewModel: CommentViewModel
+) {
+    Row(modifier = modifier){
         Icon(
             painter = painterResource(id = R.drawable.profilepng),
             contentDescription = "ProfilePic",
@@ -128,26 +144,39 @@ fun InputCommentTextField() {
             tint = Color.Unspecified,
         )
         OutlinedTextField(
-            value = "Comment",
-            onValueChange = {},
-            modifier = Modifier.padding(top = 5.dp)
-                .width(270.dp)
+            value = viewModel.commentUIState.value.comment,
+            onValueChange = {viewModel.onEvent(CommentUIEvent.CommentChanged(it))},
+            modifier = Modifier
+                .padding(top = 5.dp)
+                .width(270.dp),
+            placeholder = {
+                Text(
+                    text = "Comment",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        color = Color(0xFF262727)
+                    )
+                )
+            },
         )
         Icon(
             imageVector = Icons.AutoMirrored.Outlined.Send,
             contentDescription = "Post Comment",
-            modifier = Modifier.padding(start = 5.dp, top = 18.dp)
+            modifier = Modifier
+                .padding(start = 5.dp, top = 18.dp)
                 .size(30.dp)
                 .clickable {
+                    viewModel.onEvent(CommentUIEvent.CommentButtonClicked)
 
                 }
         )
     }
 }
 
-@Composable
-fun CommentItemRow(commentItem: CommentItem) {
 
+@Composable
+fun CommentItemRow(commentItem: Comment) {
+    val commentId = commentItem.userId
     Row {
         Icon(
             painter = painterResource(id = R.drawable.profilepng),
@@ -162,7 +191,7 @@ fun CommentItemRow(commentItem: CommentItem) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "@${commentItem.username}",
+                    text = "@${commentItem.userName}",
                     modifier = Modifier.padding(start = 10.dp, top = 10.dp),
                     color = Color.Gray
                 )
@@ -194,7 +223,7 @@ fun CommentItemRow(commentItem: CommentItem) {
                         .padding(top = 10.dp, start = 10.dp)
                 )
                 Text(
-                    text = commentItem.likesCount.toString(),
+                    text = "1",
                     modifier = Modifier.padding(start = 6.dp, top = 12.dp, end = 6.dp)
                 )
                 Icon(
@@ -204,7 +233,7 @@ fun CommentItemRow(commentItem: CommentItem) {
                         .padding(top = 10.dp)
                 )
                 Text(
-                    text = commentItem.dislikesCount.toString(),
+                    text = "2",
                     modifier = Modifier.padding(start = 6.dp, top = 12.dp)
                 )
             }
@@ -212,64 +241,10 @@ fun CommentItemRow(commentItem: CommentItem) {
     }
 }
 
-val dummyComments = listOf(
-    CommentItem(
-        username = "user1",
-        comment = "This is the first comment. Lorem ipsum dolor sit amet.",
-        likesCount = 10,
-        dislikesCount = 5
-    ),
-    CommentItem(
-        username = "user2",
-        comment = "Second comment here. consectetur adipiscing elit.",
-        likesCount = 8,
-        dislikesCount = 3
-    ),
-    CommentItem(
-        username = "user3",
-        comment = "Third comment. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        likesCount = 15,
-        dislikesCount = 2
-    ),
-    CommentItem(
-        username = "user4",
-        comment = "This is the first comment. Lorem ipsum dolor sit amet.",
-        likesCount = 10,
-        dislikesCount = 5
-    ),
-    CommentItem(
-        username = "user5",
-        comment = "Second comment here. consectetur adipiscing elit.",
-        likesCount = 8,
-        dislikesCount = 3
-    ),
-    CommentItem(
-        username = "user6",
-        comment = "Third comment. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        likesCount = 15,
-        dislikesCount = 2
-    ),CommentItem(
-        username = "user7",
-        comment = "This is the first comment. Lorem ipsum dolor sit amet.",
-        likesCount = 10,
-        dislikesCount = 5
-    ),
-    CommentItem(
-        username = "user8",
-        comment = "Second comment here. consectetur adipiscing elit.",
-        likesCount = 8,
-        dislikesCount = 3
-    ),
-    CommentItem(
-        username = "user9",
-        comment = "Third comment. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        likesCount = 15,
-        dislikesCount = 2
-    ),
-)
+
 
 @Preview(showSystemUi = true)
 @Composable
 fun CommentSectionPreview() {
-    CommentSectionPopUp(dummyComments)
+    CommentSection()
 }

@@ -70,7 +70,6 @@ class LikeDislikeViewModel : ViewModel() {
         }
     }
 
-    // Function to handle liking a video
     fun likeVideo(userId: String, videoId: String) {
         viewModelScope.launch {
             val videoRef = db.collection("videos").document(videoId)

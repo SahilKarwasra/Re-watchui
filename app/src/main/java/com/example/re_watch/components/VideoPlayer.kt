@@ -1,6 +1,11 @@
 package com.example.re_watch.components
 
+import android.app.Activity
+import android.content.Context
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.net.Uri
+import android.view.WindowManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -18,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -46,107 +52,126 @@ import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun VideoPlayer(modifier: Modifier = Modifier, uri: Uri) {
-    var isPlaying by remember { mutableStateOf(true) }
-    val context = LocalContext.current
-    val playerViewRef = remember { mutableStateOf(PlayerView(context)) }
+fun VideoPlayer(modifier: Modifier = Modifier, uri: Uri, color: Color, exoPlayer: ExoPlayer) {
 
-    val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
+    Surface(
+        modifier = modifier
+    )
+    {
+        var isPlaying by remember { mutableStateOf(true) }
+        val context = LocalContext.current
+        val playerViewRef = remember { mutableStateOf(PlayerView(context)) }
+
+//        val exoPlayer = remember {
+//            ExoPlayer.Builder(context).build().apply {
+//                setMediaItem(MediaItem.fromUri(uri))
+//                prepare()
+//                playWhenReady = true
+//            }
+//        }
+        exoPlayer.apply {
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
             playWhenReady = true
         }
-    }
-    var totalDuration by remember { mutableLongStateOf(0L) }
+        var totalDuration by remember { mutableLongStateOf(0L) }
 
-    var currentTime by remember { mutableLongStateOf(0L) }
+        var currentTime by remember { mutableLongStateOf(0L) }
 
-    var bufferedPercentage by remember { mutableIntStateOf(0) }
+        var bufferedPercentage by remember { mutableIntStateOf(0) }
 
-    Box(modifier = Modifier) {
-        AndroidView(
-            factory = { context ->
-                PlayerView(context).also{view->
-                    playerViewRef.value = view
-                    view.useController = false
-                }.apply {
-                    player = exoPlayer
+        val activity = LocalContext.current as Activity
 
-                }
-            },
-            modifier = Modifier.fillMaxSize()
-        )
+        Box(modifier = Modifier) {
+            AndroidView(
+                factory = { context ->
+                    PlayerView(context).also{ view->
+                        playerViewRef.value = view
+                        view.useController = false
+                    }.apply {
+                        player = exoPlayer
 
-
-        DisposableEffect(key1 = Unit) {
-            val listener =
-                object : Player.Listener {
-                    override fun onEvents(player: Player, events: Player.Events) {
-                        super.onEvents(player, events)
-                        totalDuration = player.duration.coerceAtLeast(0L)
-                        currentTime = player.currentPosition.coerceAtLeast(0L)
-                        bufferedPercentage = player.bufferedPercentage
                     }
-                }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
 
-            exoPlayer.addListener(listener)
 
-            onDispose {
-                exoPlayer.removeListener(listener)
-                exoPlayer.release()
-            }
-        }
-        AnimatedVisibility(
-            modifier = modifier,
-            visible = true,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ){
-            Box (Modifier.fillMaxSize()){
-                TopControl(Modifier.fillMaxWidth().align(Alignment.TopCenter))
-                CenterControls(
-                    isPlaying = { isPlaying },
-                    onReplayClick = { exoPlayer.seekBack() },
-                    onPauseToggle = {
-                        if (exoPlayer.isPlaying) {
-                            exoPlayer.pause()
-                        } else {
-                            exoPlayer.play()
+            DisposableEffect(key1 = Unit) {
+                val listener =
+                    object : Player.Listener {
+                        override fun onEvents(player: Player, events: Player.Events) {
+                            super.onEvents(player, events)
+                            totalDuration = player.duration.coerceAtLeast(0L)
+                            currentTime = player.currentPosition.coerceAtLeast(0L)
+                            bufferedPercentage = player.bufferedPercentage
                         }
-                        isPlaying = isPlaying.not()
-                    },
-                    onForwardClick = { exoPlayer.seekForward() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center)
-                )
-                BottomControls(
-                    totalDuration = { totalDuration },
-                    currentTime = { currentTime },
-                    bufferPercentage = { bufferedPercentage },
-                    onSeekChanged = { timeMs: Float -> exoPlayer.seekTo(timeMs.toLong()) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .animateEnterExit(
-                            enter =
-                            slideInVertically(
-                                initialOffsetY = { fullHeight: Int ->
-                                    fullHeight
-                                }
-                            ),
-                            exit =
-                            slideOutVertically(
-                                targetOffsetY = { fullHeight: Int ->
-                                    fullHeight
-                                }
-                            )
-                        ),
-                )
-            }
-        }
+                    }
 
+                exoPlayer.addListener(listener)
+
+                onDispose {
+                    exoPlayer.removeListener(listener)
+                    exoPlayer.release()
+                }
+            }
+            AnimatedVisibility(
+                modifier = modifier,
+                visible = true,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ){
+                Box (Modifier.fillMaxSize()){
+                    TopControl(
+                        Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.TopCenter),
+                        activity = activity,
+                        context = LocalContext.current
+                    )
+                    CenterControls(
+                        isPlaying = { isPlaying },
+                        onReplayClick = { exoPlayer.seekBack() },
+                        onPauseToggle = {
+                            if (exoPlayer.isPlaying) {
+                                exoPlayer.pause()
+                            } else {
+                                exoPlayer.play()
+                            }
+                            isPlaying = isPlaying.not()
+                        },
+                        onForwardClick = { exoPlayer.seekForward() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Center)
+                    )
+                    BottomControls(
+                        totalDuration = { totalDuration },
+                        currentTime = { currentTime },
+                        bufferPercentage = { bufferedPercentage },
+                        onSeekChanged = { timeMs: Float -> exoPlayer.seekTo(timeMs.toLong()) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .animateEnterExit(
+                                enter =
+                                slideInVertically(
+                                    initialOffsetY = { fullHeight: Int ->
+                                        fullHeight
+                                    }
+                                ),
+                                exit =
+                                slideOutVertically(
+                                    targetOffsetY = { fullHeight: Int ->
+                                        fullHeight
+                                    }
+                                )
+                            ),
+                    )
+                }
+            }
+
+        }
     }
 }
 
@@ -155,13 +180,22 @@ fun VideoPlayer(modifier: Modifier = Modifier, uri: Uri) {
 
 
 @Composable
-fun TopControl(modifier: Modifier) {
+fun TopControl(
+    modifier: Modifier,
+    activity: Activity,
+    context: Context
+) {
+    var portrait = remember {
+        mutableStateOf(true)
+    }
     Box(modifier = Modifier.fillMaxWidth()){
         IconButton(
             modifier = Modifier
                 .padding(end = 5.dp)
                 .align(Alignment.TopEnd),
-            onClick = {}
+            onClick = {
+                toggleFullScreen(activity,context)
+            }
         ) {
             Image(
                 contentScale = ContentScale.Crop,
@@ -172,6 +206,33 @@ fun TopControl(modifier: Modifier) {
     }
 
 }
+
+fun toggleFullScreen(activity: Activity,context: Context) {
+    if (isLandscapeOrientation(context = context)) {
+        exitFullScreen(activity)
+    } else {
+        enterFullScreen(activity)
+    }
+}
+
+
+fun isLandscapeOrientation(context: Context): Boolean {
+    val orientation = context.resources.configuration.orientation
+    return orientation == Configuration.ORIENTATION_LANDSCAPE
+}
+
+fun enterFullScreen(activity: Activity) {
+    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    activity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+}
+
+fun exitFullScreen(activity: Activity) {
+    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    activity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+}
+
+
+
 
 
 @Composable
@@ -304,28 +365,13 @@ fun Long.formatMinSec(): String {
 
 
 
+
+
 @Preview(showSystemUi = true)
 @Composable
 fun VideoPlayerview() {
-//
-//    PlayerControls(
-//        modifier = Modifier.fillMaxSize(),
-//        isPlaying = { true },
-//        onReplayClick = {  },
-//        onForwardClick = { },
-//        onPauseToggle = {
-//        },
-//        totalDuration = { 1010 },
-//        currentTime = { 110 },
-//        bufferPercentage = { 99 },
-//        onSeekChanged = {  },
-//        isVisible = {true}
-//    )
-    BottomControls(
-        totalDuration = { 100 },
-        currentTime = { 1110 },
-        bufferPercentage = { 11 },
-        onSeekChanged = {}
-    )
-//    TopControl(Modifier)
+
 }
+
+
+

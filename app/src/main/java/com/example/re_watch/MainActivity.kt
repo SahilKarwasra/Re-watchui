@@ -13,5 +13,6 @@ class MainActivity : ComponentActivity() {
             AppNavigation()
         }
     }
+
 }
 
