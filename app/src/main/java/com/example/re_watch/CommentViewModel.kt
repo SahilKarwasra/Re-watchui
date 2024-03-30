@@ -101,7 +101,7 @@ class CommentViewModel : ViewModel() {
                             userName = userName,
                             userProfileImage = userProfileImage
                         )
-                        fetchedComments.add(comment)
+                        fetchedComments.add(0,comment)
 
 
                         if (fetchedComments.size == comments.size) {

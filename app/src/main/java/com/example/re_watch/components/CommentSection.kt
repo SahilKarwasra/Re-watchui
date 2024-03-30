@@ -1,13 +1,15 @@
 package com.example.re_watch.components
 
+import android.util.Log
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -15,22 +17,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.re_watch.CommentViewModel
@@ -38,81 +45,104 @@ import com.example.re_watch.R
 import com.example.re_watch.data.Comment
 import com.example.re_watch.data.CommentUIEvent
 
-@Composable
-fun CommentSection() {
-    Card(
-        modifier = Modifier
-            .padding(start = 20.dp, end = 20.dp, top = 20.dp)
-            .fillMaxWidth()
-            .height(120.dp)
-            .clickable {
 
-            }
+@Composable
+fun CommentSection(commentViewModel: CommentViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    val firstComment = fetchFirstComment(commentViewModel.commentUIState.value.comments)
+
+    Log.d("first","comment ${firstComment?.comment}")
+
+
+    Row(
+        modifier = Modifier
+            .padding(5.dp)
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
     ) {
-        Row {
-            Text(
-                modifier = Modifier.padding(start = 8.dp, top = 5.dp),
-                text = " Comments",
-                fontSize = 26.sp,
-                color = Color.DarkGray
-            )
-            Text(
-                text = "2",
-                modifier = Modifier.padding(start = 6.dp, top = 7.dp),
-                fontSize = 22.sp,
-                color = Color.Gray
-            )
-        }
-        Row {
-            Row(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(300.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.profilepng),
-                    contentDescription = "ProfilePic",
-                    modifier = Modifier
-                        .padding(start = 10.dp, top = 20.dp)
-                        .size(50.dp),
-                    tint = Color.Unspecified
-                )
-                Text(
-                    text = "Nice Video, Most Recommended and useful",
-                    modifier = Modifier.padding(top = 25.dp, start = 7.dp),
-                    fontSize = 16.sp,
-                    maxLines = 2
-                )
+        Card(
+            modifier = Modifier
+                .padding(start = 20.dp, end = 20.dp, top = 20.dp)
+                .fillMaxWidth()
+        ) {
+            Column(
+            modifier = Modifier
+                .padding(12.dp))
+                {
+                Row {
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp, top = 5.dp),
+                        text = " Comments",
+                        fontSize = 26.sp,
+                        color = Color.DarkGray
+                    )
+                    Text(
+                        text = "2",
+                        modifier = Modifier.padding(start = 6.dp, top = 7.dp),
+                        fontSize = 22.sp,
+                        color = Color.Gray
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        IconButton(onClick = { expanded = !expanded }) {
+                            Icon(
+                                imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                                contentDescription = if (expanded) {
+                                    stringResource(R.string.hide_comments)
+                                } else {
+                                    stringResource(R.string.show_comment)
+                                }
+                            )
+                        }
+                    }
+                }
+                if(!expanded){
+                    Row {
+                        Row(
+                            modifier = Modifier
+                                .width(300.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.profilepng),
+                                contentDescription = "ProfilePic",
+                                modifier = Modifier
+                                    .padding(start = 10.dp, top = 20.dp)
+                                    .size(50.dp),
+                                tint = Color.Unspecified
+                            )
+                            (if(firstComment?.comment.isNullOrEmpty())"Nice Video, Most Recommended and useful"  else firstComment?.comment)?.let {
+                                Text(
+                                    text = it,
+                                    modifier = Modifier.padding(top = 25.dp, start = 7.dp),
+                                    fontSize = 16.sp,
+                                    maxLines = 2
+                                )
+                            }
+                        }
+
+                    }
+                }
+                if (expanded) {
+                    CommentSectionPopUp(commentViewModel)
+                }
             }
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.ArrowDropDown,
-                    contentDescription = "See Comments List",
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                        .size(50.dp)
-                )
-            }
+
         }
+
 
     }
 }
 
-data class CommentItem(
-    val username: String,
-    val comment: String,
-    val likesCount: Int,
-    val dislikesCount: Int
-)
 
 @Composable
 fun CommentSectionPopUp(commentViewModel: CommentViewModel) {
-    LaunchedEffect(Unit) {
-        commentViewModel.fetchComments()
-    }
+
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         LazyColumn(modifier = Modifier.padding(bottom = 90.dp, top = 10.dp)){
@@ -122,10 +152,8 @@ fun CommentSectionPopUp(commentViewModel: CommentViewModel) {
             }
         }
 
-        InputCommentTextField( modifier = Modifier.padding(16.dp),commentViewModel)
+        InputCommentTextField( modifier = Modifier,commentViewModel)
     }
-
-
 
 }
 
@@ -143,33 +171,35 @@ fun InputCommentTextField(
                 .size(50.dp),
             tint = Color.Unspecified,
         )
-        OutlinedTextField(
-            value = viewModel.commentUIState.value.comment,
-            onValueChange = {viewModel.onEvent(CommentUIEvent.CommentChanged(it))},
-            modifier = Modifier
-                .padding(top = 5.dp)
-                .width(270.dp),
-            placeholder = {
-                Text(
-                    text = "Comment",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        color = Color(0xFF262727)
+        Box(modifier = Modifier, contentAlignment = Alignment.TopEnd){
+            OutlinedTextField(
+                value = viewModel.commentUIState.value.comment,
+                onValueChange = {viewModel.onEvent(CommentUIEvent.CommentChanged(it))},
+                modifier = Modifier
+                    .padding(top = 5.dp, end = 35.dp)
+                    .width(270.dp),
+                placeholder = {
+                    Text(
+                        text = "Comment",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            color = Color(0xFF262727)
+                        )
                     )
+                },
                 )
-            },
-        )
-        Icon(
-            imageVector = Icons.AutoMirrored.Outlined.Send,
-            contentDescription = "Post Comment",
-            modifier = Modifier
-                .padding(start = 5.dp, top = 18.dp)
-                .size(30.dp)
-                .clickable {
-                    viewModel.onEvent(CommentUIEvent.CommentButtonClicked)
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.Send,
+                contentDescription = "Post Comment",
+                modifier = Modifier
+                    .padding(start = 5.dp, top = 18.dp)
+                    .size(30.dp)
+                    .clickable {
+                        viewModel.onEvent(CommentUIEvent.CommentButtonClicked)
 
-                }
-        )
+                    }
+            )
+        }
     }
 }
 
@@ -242,9 +272,10 @@ fun CommentItemRow(commentItem: Comment) {
 }
 
 
+// return latest comment in user
 
-@Preview(showSystemUi = true)
-@Composable
-fun CommentSectionPreview() {
-    CommentSection()
+fun fetchFirstComment(commentList: MutableList<Comment>): Comment? {
+
+    return commentList.firstOrNull()
 }
+

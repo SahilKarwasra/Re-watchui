@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Re-watch</string>
+    <string name="show_comment">see comments</string>
+    <string name="hide_comments">hide Comments</string>
 </resources>

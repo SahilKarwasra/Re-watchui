@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +41,7 @@ import com.example.re_watch.CommentViewModel
 import com.example.re_watch.FirestoreViewModel
 import com.example.re_watch.LikeDislikeViewModel
 import com.example.re_watch.R
-import com.example.re_watch.components.CommentSectionPopUp
+import com.example.re_watch.components.CommentSection
 import com.example.re_watch.components.VideoPlayer
 import com.example.re_watch.data.RememberWindowInfo
 import com.example.re_watch.data.WindowInfo
@@ -51,7 +52,11 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun StreamingPage(navController: NavHostController, param: VideoData?) {
     val commentViewModel: CommentViewModel = viewModel()
+    LaunchedEffect(Unit) {
+        Log.d("first","comment get ")
 
+        commentViewModel.fetchComments()
+    }
     val videoId = param?.videoId
     val title = param?.videoTitle
     val description = param?.videoDescription
@@ -175,8 +180,8 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                     }
                 }
             }
-            CommentSectionPopUp(commentViewModel)
-
+//            CommentSectionPopUp(commentViewModel)
+            CommentSection(commentViewModel = commentViewModel)
         }
     } else{
         uri?.let {
