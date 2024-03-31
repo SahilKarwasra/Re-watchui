@@ -66,7 +66,7 @@ fun CommentSection(commentViewModel: CommentViewModel) {
     ) {
         Card(
             modifier = Modifier
-                .padding(start = 20.dp, end = 20.dp, top = 20.dp)
+                .padding(start = 5.dp, end = 5.dp, top = 20.dp)
                 .fillMaxWidth()
         ) {
             Column(
@@ -235,6 +235,9 @@ fun CommentItemRow(commentItem: Comment) {
                         modifier = Modifier
                             .padding(top = 7.dp, end = 20.dp)
                             .size(25.dp)
+                            .clickable {
+
+                            }
                     )
                 }
             }
