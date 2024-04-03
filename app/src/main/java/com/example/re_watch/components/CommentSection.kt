@@ -1,15 +1,16 @@
 package com.example.re_watch.components
 
 import android.util.Log
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -17,136 +18,177 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.ThumbUp
-import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.re_watch.CommentViewModel
 import com.example.re_watch.R
 import com.example.re_watch.data.Comment
 import com.example.re_watch.data.CommentUIEvent
+import com.example.re_watch.data.RememberWindowInfo
+import kotlinx.coroutines.launch
 
 
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentSection(commentViewModel: CommentViewModel) {
     var expanded by remember { mutableStateOf(false) }
     val firstComment = fetchFirstComment(commentViewModel.commentUIState.value.comments)
-
+    val scope = rememberCoroutineScope()
+    val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val windowInfo = RememberWindowInfo()
+    val heightOfBottomSheet = windowInfo.screenHeight.value - 220
     Log.d("first","comment ${firstComment?.comment}")
-
-
-    Row(
+    val comments = commentViewModel.commentUIState.value.comments
+    Surface(
         modifier = Modifier
-            .padding(5.dp)
-            .animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                )
+            .fillMaxWidth()
+            .padding(16.dp)
+            .background(color = MaterialTheme.colorScheme.surface),
+        tonalElevation = 4.dp,
+        shadowElevation = 4.dp,
+        shape = MaterialTheme.shapes.medium,
+        onClick = {
+            expanded = !expanded
+        }
+    ){
+        Column(
+            modifier = Modifier
+                .padding(5.dp),
             )
-    ) {
-        Card(
-            modifier = Modifier
-                .padding(start = 5.dp, end = 5.dp, top = 20.dp)
-                .fillMaxWidth()
-        ) {
-            Column(
-            modifier = Modifier
-                .padding(12.dp))
-                {
-                Row {
-                    Text(
-                        modifier = Modifier.padding(start = 8.dp, top = 5.dp),
-                        text = " Comments",
-                        fontSize = 26.sp,
-                        color = Color.DarkGray
-                    )
-                    Text(
-                        text = "2",
-                        modifier = Modifier.padding(start = 6.dp, top = 7.dp),
-                        fontSize = 22.sp,
-                        color = Color.Gray
-                    )
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterEnd
-                    ) {
-                        IconButton(onClick = { expanded = !expanded }) {
-                            Icon(
-                                imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                                contentDescription = if (expanded) {
-                                    stringResource(R.string.hide_comments)
-                                } else {
-                                    stringResource(R.string.show_comment)
-                                }
-                            )
-                        }
-                    }
-                }
-                if(!expanded){
-                    Row {
-                        Row(
-                            modifier = Modifier
-                                .width(300.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.profilepng),
-                                contentDescription = "ProfilePic",
-                                modifier = Modifier
-                                    .padding(start = 10.dp, top = 20.dp)
-                                    .size(50.dp),
-                                tint = Color.Unspecified
-                            )
-                            (if(firstComment?.comment.isNullOrEmpty())"Nice Video, Most Recommended and useful"  else firstComment?.comment)?.let {
-                                Text(
-                                    text = it,
-                                    modifier = Modifier.padding(top = 25.dp, start = 7.dp),
-                                    fontSize = 16.sp,
-                                    maxLines = 2
-                                )
-                            }
-                        }
+        {
+            Row(modifier = Modifier.padding(start = 8.dp, top = 5.dp)) {
 
+                Text(
+                    text = "Comments",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = comments.size.toString(),
+                    modifier = Modifier
+                        .padding(start = 6.dp)
+                        .align(Alignment.CenterVertically),
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+
+
+            }
+            Row {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 3.dp, top = 10.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.profilepng),
+                        contentDescription = "ProfilePic",
+                        modifier = Modifier
+                            .padding(start = 10.dp,)
+                            .size(30.dp),
+                        tint = Color.Unspecified
+                    )
+                    (if(firstComment?.comment.isNullOrEmpty())"Nice Video, Most Recommended and useful"  else firstComment?.comment)?.let {
+                        Text(
+                            text = it,
+                            modifier = Modifier
+                                .padding(start = 7.dp, end = 10.dp)
+                                .align(Alignment.CenterVertically),
+                            fontSize = 13.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Black,
+                        )
                     }
                 }
-                if (expanded) {
-                    CommentSectionPopUp(commentViewModel)
-                }
+
             }
 
+
+
+            if (expanded) {
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        expanded = false
+                    },
+                    modifier = Modifier.height(heightOfBottomSheet.dp),
+                    sheetState = sheetState,
+                ){
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 10.dp, end = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top
+                    ) {
+
+                        Text(
+                            text = "Comments",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color.Black
+                        )
+                        IconButton(
+                            content = { Icon(imageVector = Icons.Default.Close, contentDescription = "Close Comments Window")},
+                            modifier = Modifier
+                                .padding(start = 10.dp,)
+                                .size(30.dp),
+                            onClick = {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        expanded = false
+                                    }
+                                }
+                            }
+                        )
+                    }
+                    Spacer(modifier = Modifier.fillMaxWidth().background(Color.Gray).height(1.dp))
+
+                    CommentSectionPopUp(commentViewModel,comments)
+                }
+
+            }
         }
-
-
     }
 }
 
 
 @Composable
-fun CommentSectionPopUp(commentViewModel: CommentViewModel) {
+fun CommentSectionPopUp(commentViewModel: CommentViewModel, comments: MutableList<Comment>) {
 
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         LazyColumn(modifier = Modifier.padding(bottom = 90.dp, top = 10.dp)){
-            items(commentViewModel.commentUIState.value.comments) { comment ->
+            items(comments) { comment ->
 
                 CommentItemRow(comment)
             }
@@ -168,7 +210,7 @@ fun InputCommentTextField(
             contentDescription = "ProfilePic",
             Modifier
                 .padding(10.dp)
-                .size(50.dp),
+                .size(45.dp),
             tint = Color.Unspecified,
         )
         Box(modifier = Modifier, contentAlignment = Alignment.TopEnd){
@@ -212,9 +254,10 @@ fun CommentItemRow(commentItem: Comment) {
             painter = painterResource(id = R.drawable.profilepng),
             contentDescription = "ProfilePic",
             Modifier
-                .padding(10.dp)
-                .size(50.dp),
+                .padding(start = 10.dp, top = 10.dp)
+                .size(30.dp),
             tint = Color.Unspecified,
+
         )
         Column{
             Row(
@@ -235,9 +278,6 @@ fun CommentItemRow(commentItem: Comment) {
                         modifier = Modifier
                             .padding(top = 7.dp, end = 20.dp)
                             .size(25.dp)
-                            .clickable {
-
-                            }
                     )
                 }
             }

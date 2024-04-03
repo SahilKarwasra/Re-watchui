@@ -1,5 +1,6 @@
 package com.example.re_watch
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -78,7 +79,7 @@ class SignUpViewModel() : ViewModel() {
         val email = signUpUIState.value.email
         val password = signUpUIState.value.password
         signUpInProgress.value = true
-        Log.d("tag","user ${email} is  ${password}")
+        Log.d("Signup","userName ${username}user ${email} is  ${password}")
 
         if (email != null && email.isNotEmpty() && password != null && password.isNotEmpty() && username != null && username.isNotEmpty()) {
 
@@ -88,21 +89,39 @@ class SignUpViewModel() : ViewModel() {
                     if (task.isSuccessful) {
                         val user = FirebaseAuth.getInstance().currentUser
                         val displayName = username
+
+
+
                         val profileUpdates = UserProfileChangeRequest.Builder()
                             .setDisplayName(displayName)
+                            .setPhotoUri(Uri.parse("http://images.com/1.jpg"))
                             .build()
+
+                        user?.updateProfile(profileUpdates)
+                            ?.addOnCompleteListener { profileTask ->
+                                if (profileTask.isSuccessful) {
+                                    val updatedDisplayName = user.displayName
+                                    val updatedPhotoUrl = user.photoUrl
+                                    Log.d("Signup", "Username:  ${displayName} ${user?.displayName}")
+                                } else {
+                                    Log.d("Signup", "User name creation  ${task.exception?.message}")
+                                }
+                            }
+
+
+
 
                         navigateToHomeScreen(navController)
                     } else {
-                        Log.d("tag", "User creation failed: ${task.exception?.message}")
+                        Log.d("Signup", "User creation failed: ${task.exception?.message}")
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.d("tag", "User creation failed: ${exception.message}")
+                    Log.d("Signup", "User creation failed: ${exception.message}")
                 }
         } else {
-            Log.d("tag", "Email or password is empty or null")
-            // Handle the case where email or password is empty or null
+            Log.d("Signup", "Email or password is empty or null")
+
         }
 
     }
@@ -121,13 +140,6 @@ class SignUpViewModel() : ViewModel() {
             Log.e(TAG, "Error navigating to HomeScreen: ${e.message}", e)
         }
     }
-
-//    val database = FirebaseDatabase.getInstance()
-//    val usersRef = database.getReference("users")
-//    val userDetails = hashMapOf(
-//        "username" to username,
-//    )
-//    usersRef.child(userId).setValue(userDetails)
 
 
 

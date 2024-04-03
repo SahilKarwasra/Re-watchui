@@ -11,6 +11,7 @@ import com.example.re_watch.screens.HomeScreen
 import com.example.re_watch.screens.LikedScreen
 import com.example.re_watch.screens.LoginScreen
 import com.example.re_watch.screens.ProfileScreen
+import com.example.re_watch.screens.SearchScreen
 import com.example.re_watch.screens.SignUpScreen
 import com.example.re_watch.screens.StreamingPage
 import com.example.re_watch.screens.WelcomeScreen
@@ -60,6 +61,9 @@ fun AppNavigation() {
         }
         composable(AppScreens.LikedScreen.route) {
             LikedScreen(navController = navController)
+        }
+        composable(AppScreens.SearchScreen.route) {
+            SearchScreen(navController = navController)
         }
 
 

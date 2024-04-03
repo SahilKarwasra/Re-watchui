@@ -8,4 +8,5 @@ sealed class AppScreens(val route: String) {
     data object ProfileScreen: AppScreens("profile_screen")
     data object StreamingPage: AppScreens("video")
     data object LikedScreen: AppScreens("liked_screen")
+    data object SearchScreen: AppScreens("search_screen")
 }

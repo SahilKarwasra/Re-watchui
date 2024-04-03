@@ -7,19 +7,18 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -94,10 +93,9 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
 
             Card(
                 modifier = Modifier
-                    .height(433.dp)
                     .width(340.dp),
-            ) {
-                Row {
+            ){
+                Column {
                     Button(
                         onClick = {
                             if (permissionState.status.isGranted) {
@@ -132,48 +130,90 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
                     ) {
                         Text(text = "Select Video")
                     }
-                    Icon(
-                        imageVector = Icons.Rounded.Check,
-                        contentDescription = "File Uploaded",
-                        modifier = Modifier
-                            .padding(top = 102.dp)
-                    )
-                }
-                OutlinedTextField(
-                    value = viewModelvideo.uploadUIState.value.title,
-                    onValueChange = {
-                        viewModelvideo.onEvent(UploadUIEvent.TitleChanged(it))
-                    },
-                    modifier = Modifier.padding(top = 25.dp, start = 30.dp),
-                    placeholder = {
-                        Text(
-                            text = "Title (required)",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                color = Color(0xFF262727)
-                            )
-                        )
-                    },
+//                    Icon(
+//                        imageVector = Icons.Rounded.Check,
+//                        contentDescription = "File Uploaded",
+//                        modifier = Modifier
+//                            .padding()
+//                    )
 
-                )
-                OutlinedTextField(
-                    value = viewModelvideo.uploadUIState.value.description,
-                    onValueChange = {
-                        viewModelvideo.onEvent(UploadUIEvent.DescriptionChanged(it))
-                    },
-                    modifier = Modifier
-                        .padding(top = 30.dp, start = 30.dp)
-                        .height(120.dp),
-                    placeholder = {
-                        Text(
-                            text = "Description",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                color = Color(0xFF262727)
+                    OutlinedTextField(
+                        value = viewModelvideo.uploadUIState.value.title,
+                        onValueChange = {
+                            viewModelvideo.onEvent(UploadUIEvent.TitleChanged(it))
+                        },
+                        modifier = Modifier.padding(top = 25.dp, start = 30.dp),
+                        placeholder = {
+                            Text(
+                                text = "Title (required)",
+                                style = TextStyle(
+                                    fontSize = 18.sp,
+                                    color = Color(0xFF262727)
+                                )
                             )
+                        },
+
                         )
-                    },
-                )
+                    OutlinedTextField(
+                        value = viewModelvideo.uploadUIState.value.description,
+                        onValueChange = {
+                            viewModelvideo.onEvent(UploadUIEvent.DescriptionChanged(it))
+                        },
+                        modifier = Modifier
+                            .padding(top = 30.dp, start = 30.dp)
+                            .height(120.dp),
+                        placeholder = {
+                            Text(
+                                text = "Description",
+                                style = TextStyle(
+                                    fontSize = 18.sp,
+                                    color = Color(0xFF262727)
+                                )
+                            )
+                        },
+                    )
+                    Text(
+                        text = "Must Every Tag Is Separated With Comma (,)",
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        ),
+                        modifier = Modifier.padding(top = 25.dp, start = 30.dp),
+                    )
+                    OutlinedTextField(
+                        value = viewModelvideo.uploadUIState.value.videoTags,
+                        onValueChange = {
+                            viewModelvideo.onEvent(UploadUIEvent.videoTagsChanged(it.replace(" ",",")))
+                        },
+                        modifier = Modifier.padding(top = 25.dp, start = 30.dp),
+                        placeholder = {
+                            Text(
+                                text = "Tags",
+                                style = TextStyle(
+                                    fontSize = 18.sp,
+                                    color = Color(0xFF262727)
+                                )
+                            )
+                        },
+                    )
+                    Button(
+                        onClick = {
+                            viewModelvideo.onEvent(UploadUIEvent.UploadButtonClicked)
+                        },
+                        modifier = Modifier
+                            .padding(start = 120.dp, top = 30.dp, bottom = 30.dp)
+                            .width(100.dp),
+                        colors = ButtonColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Black,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.Black
+                        )
+                    ) {
+                        Text(text = "Upload")
+                    }
+
+                }
             }
         }
         Box(
@@ -184,29 +224,14 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
                 painter = painterResource(id = R.drawable.profilepng),
                 contentDescription = "null",
                 modifier = Modifier
-                    .padding(top = 120.dp)
+                    .padding(top = 105.dp)
                     .size(100.dp)
                     .fillMaxSize(),
                 tint = Color.Unspecified
             )
         }
-        Button(
-            onClick = {
-                viewModelvideo.onEvent(UploadUIEvent.UploadButtonClicked)
 
-            },
-            modifier = Modifier
-                .padding(start = 120.dp, top = 575.dp)
-                .width(100.dp),
-            colors = ButtonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black,
-                disabledContainerColor = Color.Gray,
-                disabledContentColor = Color.Black
-            )
-        ) {
-            Text(text = "Upload")
-        }
+
     }
 }
 

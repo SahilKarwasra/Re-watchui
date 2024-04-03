@@ -51,6 +51,11 @@ class VideoPickerViewModel : ViewModel() {
                     description = event.videoDescription
                 )
             }
+            is UploadUIEvent.videoTagsChanged ->{
+                uploadUIState.value = uploadUIState.value.copy(
+                    videoTags = event.videoTagsSelected
+                )
+            }
             is UploadUIEvent.UploadButtonClicked ->{
                 uploadVideo()
             }
@@ -73,6 +78,9 @@ class VideoPickerViewModel : ViewModel() {
         val uri = Uri.parse(uploadUIState.value.videoUri)
         val photoUrl = FirebaseAuth.getInstance().currentUser?.photoUrl
         val userProfileUrl = FirebaseAuth.getInstance().currentUser?.displayName?:"null"
+        val videoTags = uploadUIState.value.videoTags
+        val tagsList = createVideoTags(videoTags,userDisplayName,title)
+
 
         val storageReference = FirebaseStorage.getInstance().reference
         val videoRef: StorageReference = storageReference.child("videos/${UUID.randomUUID()}")
@@ -87,7 +95,8 @@ class VideoPickerViewModel : ViewModel() {
             "title" to title,
             "description" to description,
             "photoUrl" to photoUrl,
-            "userProfileUrl" to userProfileUrl
+            "userProfileUrl" to userProfileUrl,
+            "tags" to tagsList
 
         )
         Log.d("Upload", "Uri.parse(uri.value)")
@@ -128,4 +137,22 @@ class VideoPickerViewModel : ViewModel() {
                     .show()
             }
     }
+
 }
+fun createVideoTags(tags: String,userDisplayName: String, title: String): List<String> {
+
+
+
+    val tagsList = tags.lowercase().split(",").map { it.trim().replace(" ", "") }
+    val userNameTags = userDisplayName.lowercase().split(" ").map { it.trim().replace(" ", "") }
+    val titleTags = title.lowercase().split(" ").map { it.trim().replace(" ", "") }
+    val username = userDisplayName.lowercase().replace(" ","")
+
+
+    val mainList = listOf(username) + userNameTags+ tagsList + titleTags
+
+
+    return mainList
+}
+
+

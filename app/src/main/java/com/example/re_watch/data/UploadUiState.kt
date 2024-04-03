@@ -6,5 +6,6 @@ data class UploadUiState(
     var description: String = "",
     var uriError: Boolean = false,
     var titleError: Boolean = false,
-    var descriptionError: Boolean = false
+    var descriptionError: Boolean = false,
+    var videoTags: String = ""
 )
