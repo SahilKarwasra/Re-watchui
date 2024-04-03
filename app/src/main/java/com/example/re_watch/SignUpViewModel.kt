@@ -9,9 +9,17 @@ import androidx.navigation.NavHostController
 import com.example.re_watch.data.SignUpUIEvent
 import com.example.re_watch.data.SignUpUIState
 import com.example.re_watch.navigation.AppScreens
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.database.database
 
+data class User(
+    val displayName: String,
+    val email: String,
+    val profileUrl: String,
+    val profileImage: String // You can include any other user information you want to store
+)
 class SignUpViewModel() : ViewModel() {
 
     private val TAG = SignUpViewModel::class.simpleName
@@ -88,10 +96,20 @@ class SignUpViewModel() : ViewModel() {
                     signUpInProgress.value = false
                     if (task.isSuccessful) {
                         val user = FirebaseAuth.getInstance().currentUser
+                        val userId = user?.uid
                         val displayName = username
 
+                        val userData = user?.email?.let {
+                            User(
+                                displayName = displayName,
+                                email = it,
+                                profileUrl = "test",
+                                profileImage = user.photoUrl.toString()
+                            )
+                        }
 
 
+                        userId?.let { userData?.let { it1 -> saveUserData(userId = it, it1) } }
                         val profileUpdates = UserProfileChangeRequest.Builder()
                             .setDisplayName(displayName)
                             .setPhotoUri(Uri.parse("http://images.com/1.jpg"))
@@ -107,9 +125,6 @@ class SignUpViewModel() : ViewModel() {
                                     Log.d("Signup", "User name creation  ${task.exception?.message}")
                                 }
                             }
-
-
-
 
                         navigateToHomeScreen(navController)
                     } else {
@@ -142,5 +157,23 @@ class SignUpViewModel() : ViewModel() {
     }
 
 
+
+
+    fun saveUserData(userId: String, user: User) {
+        val database = Firebase.database
+        val usersRef = database.getReference("users")
+
+        // Push user data to a new child node using the user's ID
+        usersRef.child(userId).setValue(user)
+            .addOnSuccessListener {
+                // Data successfully saved
+                println("User data saved successfully")
+                Log.d("Signup", "User data saved successfully")
+            }
+            .addOnFailureListener { exception ->
+                // Handle error
+                Log.d("Signup", "Error saving user data: $exception")
+            }
+    }
 
 }

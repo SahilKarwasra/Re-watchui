@@ -93,8 +93,8 @@ class CommentViewModel : ViewModel() {
                 // data fetch from realtime database
                 FirebaseDatabase.getInstance().getReference("users").child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        val userName = dataSnapshot.child("username").getValue(String::class.java) ?: ""
-                        val userProfileImage = dataSnapshot.child("userProfileImage").getValue(String::class.java) ?: ""
+                        val userName = dataSnapshot.child("displayName").getValue(String::class.java) ?: ""
+                        val userProfileImage = dataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
                         val comment = Comment(
                             userId = userId,
                             comment = commentMap["comment"].toString(),
@@ -153,3 +153,5 @@ class CommentViewModel : ViewModel() {
 
 
 }
+
+
