@@ -7,8 +7,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
@@ -18,9 +20,12 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -45,7 +50,7 @@ import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavHostController){
+fun SearchScreen(navController: NavHostController) {
     var searchQuery by remember { mutableStateOf("") }
     val searchViewModel: SearchViewModel = viewModel()
     val videoList by searchViewModel.videoSearchList.observeAsState(initial = emptyList())
@@ -69,10 +74,21 @@ fun SearchScreen(navController: NavHostController){
                             modifier = Modifier
                                 .size(30.dp)
                                 .clickable {
-
+                                    navController.popBackStack()
                                 }
                         )
-                        TextField(value = searchQuery, onValueChange = {searchQuery = it}, )
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            maxLines = 1,
+                            colors = TextFieldDefaults.textFieldColors(
+                                containerColor = Color.Transparent,
+                                focusedTextColor = Color(0xFFECF3F3),
+                                unfocusedTextColor = Color(0xFFBEC2C2),
+                                focusedIndicatorColor = Color(0xFFBEC2C2),
+                                unfocusedIndicatorColor = Color(0xFFBEC2C2)
+                            )
+                        )
                     }
                 },
                 actions = {
@@ -101,11 +117,13 @@ fun SearchScreen(navController: NavHostController){
             FloatingProfileButton {
                 navController.navigate(route = AppScreens.ProfileScreen.route)
             }
-        }){
-        Surface(modifier = Modifier
-            .padding(it)
-            .fillMaxHeight()
-            .fillMaxWidth()) {
+        }) {
+        Surface(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxHeight()
+                .fillMaxWidth()
+        ) {
 
             LazyColumn(
                 modifier = Modifier
@@ -119,8 +137,8 @@ fun SearchScreen(navController: NavHostController){
                         val videodata =
                             VideoData(
                                 userDisplayName = video.userDisplayName,
-                                uploadTime =  video.uploadTime,
-                                videoUrl =  Uri.encode(video.videoUrl),
+                                uploadTime = video.uploadTime,
+                                videoUrl = Uri.encode(video.videoUrl),
                                 userPhoto = video.userPhotoUrl,
                                 userProfileUrl = video.userProfileUrl,
                                 videoTitle = video.videoTitle,
