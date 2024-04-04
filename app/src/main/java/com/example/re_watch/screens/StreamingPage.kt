@@ -21,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,7 +57,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun StreamingPage(navController: NavHostController, param: VideoData?) {
     val commentViewModel: CommentViewModel = viewModel()
     LaunchedEffect(Unit) {
-        Log.d("first","comment get ")
+        Log.d("first", "comment get ")
 
         commentViewModel.fetchComments()
     }
@@ -79,8 +80,11 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
     val windowInfo = RememberWindowInfo()
 
 
-    Log.d("window","height: ${windowInfo.screenHeight},,, width: ${windowInfo.screenWidth}  ,,, info width ${windowInfo.screenWidthInfo}")
-    if(windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact ){
+    Log.d(
+        "window",
+        "height: ${windowInfo.screenHeight},,, width: ${windowInfo.screenWidth}  ,,, info width ${windowInfo.screenWidthInfo}"
+    )
+    if (windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact) {
         Column {
             if (uri != null) {
                 VideoPlayer(
@@ -89,7 +93,8 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                         .height(220.dp)
                         .fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    exoPlayer = exoPlayer)
+                    exoPlayer = exoPlayer
+                )
             }
             Column {
                 Row(
@@ -117,7 +122,10 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                         }
                         displayName?.let {
                             Text(
-                                text = it, maxLines = 1, fontWeight = FontWeight(300), fontSize = 16.sp
+                                text = it,
+                                maxLines = 1,
+                                fontWeight = FontWeight(300),
+                                fontSize = 16.sp
                             )
                         }
                     }
@@ -126,16 +134,21 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(modifier = Modifier.weight(1f))
-                    Button(
+                    OutlinedButton(
                         modifier = Modifier
                             .padding(top = 7.dp)
                             .width(100.dp)
                             .height(45.dp)
-                            .clip(RoundedCornerShape(25.dp))
-                            .background(color = MaterialTheme.colorScheme.primary),
+                            .clip(RoundedCornerShape(25.dp)),
                         onClick = {
-                            videoId?.let { userId?.let { it1 -> likeDislikeViewModel.likeVideo(videoId = it, userId = it1) } }
-
+                            videoId?.let {
+                                userId?.let { it1 ->
+                                    likeDislikeViewModel.likeVideo(
+                                        videoId = it,
+                                        userId = it1
+                                    )
+                                }
+                            }
                         }
 
                     ) {
@@ -145,7 +158,7 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                                 contentDescription = "Like icon",
                                 modifier = Modifier
                                     .size(30.dp),
-                                tint = Color.White
+                                tint = Color.Red
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
@@ -156,15 +169,21 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                             )
                         }
                     }
-                    Button(
+                    OutlinedButton(
                         modifier = Modifier
                             .padding(top = 7.dp)
                             .width(100.dp)
                             .height(45.dp)
-                            .clip(RoundedCornerShape(25.dp))
-                            .background(color = MaterialTheme.colorScheme.primary),
+                            .clip(RoundedCornerShape(25.dp)),
                         onClick = {
-                            userId?.let { videoId?.let { it1 -> likeDislikeViewModel.dislikeVideo(userId = it,videoId = it1) } }
+                            userId?.let {
+                                videoId?.let { it1 ->
+                                    likeDislikeViewModel.dislikeVideo(
+                                        userId = it,
+                                        videoId = it1
+                                    )
+                                }
+                            }
                         }
                     ) {
                         Row {
@@ -173,7 +192,7 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                                 contentDescription = "Dislike Icon",
                                 modifier = Modifier
                                     .size(30.dp),
-                                tint = Color.White
+                                tint = Color.Gray
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
@@ -190,14 +209,15 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
             }
 
         }
-    } else{
+    } else {
         uri?.let {
             VideoPlayer(
                 uri = it,
                 modifier =
                 Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background,
-                exoPlayer = exoPlayer)
+                exoPlayer = exoPlayer
+            )
         }
     }
 }

@@ -71,7 +71,7 @@ fun CommentSection(commentViewModel: CommentViewModel) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 30.dp)
             .background(color = MaterialTheme.colorScheme.surface),
         tonalElevation = 4.dp,
         shadowElevation = 4.dp,
@@ -106,15 +106,15 @@ fun CommentSection(commentViewModel: CommentViewModel) {
             Row {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(bottom = 3.dp, top = 10.dp)
+                        .fillMaxWidth()
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.profilepng),
                         contentDescription = "ProfilePic",
                         modifier = Modifier
                             .padding(start = 10.dp,)
-                            .size(30.dp),
+                            .size(50.dp),
                         tint = Color.Unspecified
                     )
                     (if(firstComment?.comment.isNullOrEmpty())"Nice Video, Most Recommended and useful"  else firstComment?.comment)?.let {
@@ -123,7 +123,7 @@ fun CommentSection(commentViewModel: CommentViewModel) {
                             modifier = Modifier
                                 .padding(start = 7.dp, end = 10.dp)
                                 .align(Alignment.CenterVertically),
-                            fontSize = 13.sp,
+                            fontSize = 18.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodySmall,
