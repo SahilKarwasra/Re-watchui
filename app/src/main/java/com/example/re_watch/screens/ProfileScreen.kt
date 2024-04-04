@@ -177,19 +177,6 @@ fun MainProfileScreen(navController: NavHostController) {
                             )
                         }
                         Button(
-                            onClick = { /*TODO*/ },
-                            shape = MaterialTheme.shapes.large,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF4372F1)
-                            ),
-                            modifier = Modifier
-                                .padding(top = 20.dp, bottom = 5.dp)
-                                .width(100.dp)
-                                .height(52.dp)
-                        ) {
-                            Text(text = "Remove Videos")
-                        }
-                        Button(
                             onClick = {
                                 navController.navigate(route = AppScreens.SettingScreen.route)
                             },
@@ -207,6 +194,20 @@ fun MainProfileScreen(navController: NavHostController) {
                             )
                         }
                         Button(
+                            onClick = { /*TODO*/ },
+                            shape = MaterialTheme.shapes.large,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4372F1)
+                            ),
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 5.dp)
+                                .width(100.dp)
+                                .height(52.dp)
+                        ) {
+                            Text(text = "Remove Videos")
+                        }
+
+                        Button(
                             onClick = {
                                 FirebaseAuth.getInstance().signOut()
                                 navController.popBackStack(
@@ -222,7 +223,7 @@ fun MainProfileScreen(navController: NavHostController) {
                             },
                             shape = MaterialTheme.shapes.large,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF4372F1)
+                                containerColor = Color(0xFFFF0048)
                             ),
                             modifier = Modifier
                                 .padding(top = 20.dp, bottom = 20.dp)
@@ -235,7 +236,7 @@ fun MainProfileScreen(navController: NavHostController) {
                                 style = TextStyle(
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight(500),
-                                    color = Color.White
+                                    color = Color(0xFFDDD2D5)
                                 )
                             )
                         }

@@ -224,7 +224,7 @@ fun UploadVideoPopUp(onDismiss: () -> Unit) {
                 painter = painterResource(id = R.drawable.profilepng),
                 contentDescription = "null",
                 modifier = Modifier
-                    .padding(top = 105.dp)
+                    .padding(top = 20.dp)
                     .size(100.dp)
                     .fillMaxSize(),
                 tint = Color.Unspecified
