@@ -134,7 +134,6 @@ class CommentViewModel : ViewModel() {
             }
             videoRef.update("comments", updatedComments)
         }.addOnFailureListener { exception ->
-            // Handle fetch failure
         }
     }
 

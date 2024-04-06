@@ -1,8 +1,12 @@
 package com.example.re_watch.screens
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,15 +51,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.re_watch.R
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.example.re_watch.ImageUploaderViewModel
 import com.example.re_watch.Validator
 import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
@@ -65,7 +76,7 @@ import com.google.firebase.database.database
 
 @Composable
 fun SettingsScreen(navController: NavHostController) {
-
+    val viewModel: ImageUploaderViewModel = viewModel()
     Scaffold(
         topBar = { ProfileSettingsTopBar() }
     ) {
@@ -74,7 +85,7 @@ fun SettingsScreen(navController: NavHostController) {
                 .padding(it)
                 .fillMaxSize()
         ) {
-            ProfileSettingsContent()
+            ProfileSettingsContent(viewModel = viewModel)
         }
     }
 }
@@ -116,7 +127,7 @@ fun ProfileSettingsTopBar() {
     )
 }
 @Composable
-fun ProfileSettingsContent() {
+fun ProfileSettingsContent(viewModel:ImageUploaderViewModel) {
     val firebaseAuth = FirebaseAuth.getInstance().currentUser
 
     var username by remember { mutableStateOf(firebaseAuth?.displayName) }
@@ -134,7 +145,7 @@ fun ProfileSettingsContent() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        ProfilePhotoSection(onClick = { showDialog = true })
+        ProfilePhotoSection(onClick = { showDialog = true }, viewModel = viewModel)
         if (isEditingUsername) {
             fetchedDisplayName =
                 EditableProfileInfoItem(
@@ -166,16 +177,22 @@ fun ProfileSettingsContent() {
     }
 
     if (showDialog) {
-        ProfileImagePickerDialog(onDismiss = { showDialog = false }) {
-            // Handle profile image update
-        }
+        ProfileImagePickerDialog(onDismiss = { showDialog = false }, viewModel = viewModel)
     }
 }
 
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ProfilePhotoSection(onClick: () -> Unit) {
-    // Placeholder for profile photo
+fun ProfilePhotoSection(onClick: () -> Unit,viewModel: ImageUploaderViewModel) {
+    val user = FirebaseAuth.getInstance().currentUser
+    var profileImage by remember {
+        mutableStateOf(user?.photoUrl)
+    }
+    if(viewModel.uploaded.value){
+        profileImage = user?.photoUrl
+    }
+
     Box(
         modifier = Modifier
             .size(120.dp)
@@ -184,10 +201,11 @@ fun ProfilePhotoSection(onClick: () -> Unit) {
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.profilepng),
-            contentDescription = "Profile Photo",
-            modifier = Modifier.size(100.dp),
+        GlideImage(
+            model = profileImage,
+            contentDescription = "ProfilePic",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
         )
         Icon(
             imageVector = Icons.Filled.Edit,
@@ -197,6 +215,8 @@ fun ProfilePhotoSection(onClick: () -> Unit) {
         )
     }
 }
+
+
 
 @Composable
 fun ProfileInfoItem(label: String, value: String,isEditable: Boolean,onClick: () -> Unit) {
@@ -352,8 +372,66 @@ fun ChangePasswordDialog() {
 }
 
 @Composable
-fun ProfileImagePickerDialog(onDismiss: () -> Unit, onImageSelected: () -> Unit) {
-    // Placeholder for profile image picker dialog
+fun ProfileImagePickerDialog(onDismiss: () -> Unit,viewModel:ImageUploaderViewModel) {
+    var photoUri: Uri? by remember { mutableStateOf(null) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        photoUri = uri
+    }
+    Dialog(
+        onDismissRequest = { onDismiss()},
+        content = {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                photoUri?.let {
+                    val painter = rememberAsyncImagePainter(
+                        ImageRequest
+                            .Builder(LocalContext.current)
+                            .data(data = it)
+                            .build()
+                    )
+                    Image(
+                        painter = painter,
+                        contentDescription = "Selected Image",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        launcher.launch(PickVisualMediaRequest(
+                            mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                        ))
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    Text(text = "Pick Image")
+                }
+
+                Button(
+                    onClick = {
+                        photoUri?.let { uri ->
+                            viewModel.uploadProfileImageToFirebase(uri)
+                            onDismiss()
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    Text(text = "Upload Image")
+                }
+            }
+        }
+    )
 }
 
 @Composable
@@ -374,6 +452,7 @@ fun updateDisplayName(displayName: String) {
     val database = Firebase.database
     val usersRef = database.getReference("users")
 
+
     val profileUpdates = UserProfileChangeRequest.Builder()
         .setDisplayName(displayName)
         .build()
@@ -381,7 +460,7 @@ fun updateDisplayName(displayName: String) {
     user?.updateProfile(profileUpdates)
         ?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Update successful.
+                // Update successful
             } else {
                 // Handle error
             }

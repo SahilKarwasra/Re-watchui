@@ -21,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -46,7 +45,7 @@ import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavHostController) {
+fun SearchScreen(navController: NavHostController){
     var searchQuery by remember { mutableStateOf("") }
     val searchViewModel: SearchViewModel = viewModel()
     val videoList by searchViewModel.videoSearchList.observeAsState(initial = emptyList())
@@ -70,21 +69,10 @@ fun SearchScreen(navController: NavHostController) {
                             modifier = Modifier
                                 .size(30.dp)
                                 .clickable {
-                                    navController.popBackStack()
+
                                 }
                         )
-                        TextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            maxLines = 1,
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Transparent,
-                                focusedTextColor = Color(0xFFECF3F3),
-                                unfocusedTextColor = Color(0xFFBEC2C2),
-                                focusedIndicatorColor = Color(0xFFBEC2C2),
-                                unfocusedIndicatorColor = Color(0xFFBEC2C2)
-                            )
-                        )
+                        TextField(value = searchQuery, onValueChange = {searchQuery = it}, )
                     }
                 },
                 actions = {
@@ -113,13 +101,11 @@ fun SearchScreen(navController: NavHostController) {
             FloatingProfileButton {
                 navController.navigate(route = AppScreens.ProfileScreen.route)
             }
-        }) {
-        Surface(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxHeight()
-                .fillMaxWidth()
-        ) {
+        }){
+        Surface(modifier = Modifier
+            .padding(it)
+            .fillMaxHeight()
+            .fillMaxWidth()) {
 
             LazyColumn(
                 modifier = Modifier
@@ -129,14 +115,13 @@ fun SearchScreen(navController: NavHostController) {
             ) {
                 items(videoList) { video ->
                     VideoCard(video.userDisplayName, video.videoTitle, video.videoUrl, onClick = {
-                        Log.d("videoList", "video card item clicked${video.videoDescription}")
+                        Log.d("videoList", "video card item clicked${video.userDisplayName}")
                         val videodata =
                             VideoData(
                                 userDisplayName = video.userDisplayName,
-                                uploadTime = video.uploadTime,
-                                videoUrl = Uri.encode(video.videoUrl),
-                                userPhoto = video.userPhotoUrl,
-                                userProfileUrl = video.userProfileUrl,
+                                videoUrl =  Uri.encode(video.videoUrl),
+                                userProfileImage = Uri.encode(video.userProfileImage),
+                                userProfileUrl = Uri.encode(video.userProfileUrl),
                                 videoTitle = video.videoTitle,
                                 videoDescription = video.videoDescription,
                                 videoId = video.videoId

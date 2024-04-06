@@ -1,6 +1,5 @@
 package com.example.re_watch.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Close
@@ -40,38 +40,44 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.re_watch.CommentViewModel
-import com.example.re_watch.R
 import com.example.re_watch.data.Comment
 import com.example.re_watch.data.CommentUIEvent
 import com.example.re_watch.data.RememberWindowInfo
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
 
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun CommentSection(commentViewModel: CommentViewModel) {
+    val user = FirebaseAuth.getInstance().currentUser
     var expanded by remember { mutableStateOf(false) }
     val firstComment = fetchFirstComment(commentViewModel.commentUIState.value.comments)
     val scope = rememberCoroutineScope()
     val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val windowInfo = RememberWindowInfo()
     val heightOfBottomSheet = windowInfo.screenHeight.value - 220
-    Log.d("first","comment ${firstComment?.comment}")
+    val profileImage = firstComment?.userProfileImage
+
     val comments = commentViewModel.commentUIState.value.comments
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 30.dp)
+            .padding(16.dp)
             .background(color = MaterialTheme.colorScheme.surface),
         tonalElevation = 4.dp,
         shadowElevation = 4.dp,
@@ -106,24 +112,27 @@ fun CommentSection(commentViewModel: CommentViewModel) {
             Row {
                 Row(
                     modifier = Modifier
-                        .padding(bottom = 3.dp, top = 10.dp)
                         .fillMaxWidth()
+                        .padding(bottom = 3.dp, top = 10.dp)
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.profilepng),
+
+                    GlideImage(
+                        model = profileImage,
                         contentDescription = "ProfilePic",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .padding(start = 10.dp,)
-                            .size(50.dp),
-                        tint = Color.Unspecified
-                    )
+                            .size(30.dp)
+                            .clip(CircleShape),
+
+                        )
                     (if(firstComment?.comment.isNullOrEmpty())"Nice Video, Most Recommended and useful"  else firstComment?.comment)?.let {
                         Text(
                             text = it,
                             modifier = Modifier
                                 .padding(start = 7.dp, end = 10.dp)
                                 .align(Alignment.CenterVertically),
-                            fontSize = 18.sp,
+                            fontSize = 13.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodySmall,
@@ -171,9 +180,12 @@ fun CommentSection(commentViewModel: CommentViewModel) {
                             }
                         )
                     }
-                    Spacer(modifier = Modifier.fillMaxWidth().background(Color.Gray).height(1.dp))
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Gray)
+                        .height(1.dp))
 
-                    CommentSectionPopUp(commentViewModel,comments)
+                    user?.let { CommentSectionPopUp(commentViewModel,comments,user = it) }
                 }
 
             }
@@ -183,7 +195,7 @@ fun CommentSection(commentViewModel: CommentViewModel) {
 
 
 @Composable
-fun CommentSectionPopUp(commentViewModel: CommentViewModel, comments: MutableList<Comment>) {
+fun CommentSectionPopUp(commentViewModel: CommentViewModel, comments: MutableList<Comment>,user: FirebaseUser) {
 
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
@@ -194,25 +206,31 @@ fun CommentSectionPopUp(commentViewModel: CommentViewModel, comments: MutableLis
             }
         }
 
-        InputCommentTextField( modifier = Modifier,commentViewModel)
+        InputCommentTextField( modifier = Modifier,commentViewModel,user = user)
     }
 
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun InputCommentTextField(
     modifier: Modifier,
-    viewModel: CommentViewModel
+    viewModel: CommentViewModel,
+    user: FirebaseUser
 ) {
+    val profileImage = user.photoUrl
+
     Row(modifier = modifier){
-        Icon(
-            painter = painterResource(id = R.drawable.profilepng),
+        GlideImage(
+            model = profileImage,
             contentDescription = "ProfilePic",
-            Modifier
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
                 .padding(10.dp)
-                .size(45.dp),
-            tint = Color.Unspecified,
-        )
+                .size(45.dp)
+                .clip(CircleShape),
+
+            )
         Box(modifier = Modifier, contentAlignment = Alignment.TopEnd){
             OutlinedTextField(
                 value = viewModel.commentUIState.value.comment,
@@ -246,17 +264,20 @@ fun InputCommentTextField(
 }
 
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CommentItemRow(commentItem: Comment) {
     val commentId = commentItem.userId
+    val profileImage = commentItem.userProfileImage
     Row {
-        Icon(
-            painter = painterResource(id = R.drawable.profilepng),
+        GlideImage(
+            model = profileImage,
             contentDescription = "ProfilePic",
-            Modifier
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
                 .padding(start = 10.dp, top = 10.dp)
-                .size(30.dp),
-            tint = Color.Unspecified,
+                .size(30.dp)
+                .clip(CircleShape),
 
         )
         Column{

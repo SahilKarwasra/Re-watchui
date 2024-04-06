@@ -4,25 +4,24 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+
 
 data class Video(
-    val videoId: String,
-    val userId: String,
-    val userEmail: String,
-    val userDisplayName: String,
-    val uploadTime: String,
-    val videoUrl: String,
-    val videoTitle: String,
-    val videoDescription: String,
-    val userProfileUrl: String,
-    val userPhotoUrl: String,
-    val videotags: List<String>
+    var videoId: String,
+    var userId:String,
+    var userDisplayName: String,
+    var videoUrl: String,
+    var videoTitle: String,
+    var videoDescription: String,
+    var userProfileUrl: String,
+    var userProfileImage: String,
+    var videotags: List<String>
 )
 
 class FirestoreViewModel : ViewModel() {
@@ -34,7 +33,6 @@ class FirestoreViewModel : ViewModel() {
     private val _videoLikedList = MutableLiveData<List<Video>>()
     val videoLikedList: LiveData<List<Video>> = _videoLikedList
 
-
     fun fetchAllVideosFromFirestore() {
         val db = FirebaseFirestore.getInstance()
 
@@ -42,32 +40,64 @@ class FirestoreViewModel : ViewModel() {
             .get()
             .addOnSuccessListener { result ->
                 val videoLists = mutableListOf<Video>()
+                val userIds = mutableSetOf<String>() // To store unique user ids
+
+                // Collect video data and user ids
                 for (document in result) {
                     val videoId = document.id
                     val userId = document.getString("userId") ?: ""
-                    val userEmail = document.getString("userEmail") ?: ""
-                    val userDisplayName = document.getString("userDisplayName") ?: ""
-                    val uploadTimeTimestamp = document.getTimestamp("uploadTime") ?: Timestamp.now()
-                    val uploadTime = convertTimestampToDate(uploadTimeTimestamp)
                     val videoUrl = document.getString("videoUrl") ?: ""
                     val videoTitle = document.getString("title") ?: ""
-                    val userProfileUrl = document.getString("userProfileUrl") ?: ""
-                    val userPhotoUrl = document.getString("userPhotoUrl") ?: ""
                     val videoDescription = document.getString("description") ?: ""
                     val videoTags = document.get("videoTags") as? List<String> ?: listOf()
 
+                    userIds.add(userId)
 
-
-                    val video = Video(videoId,userId,userEmail, userDisplayName, uploadTime, videoUrl, videoTitle, videoDescription, userProfileUrl, userPhotoUrl,videoTags)
+                    val video = Video(videoId, userId, "", videoUrl, videoTitle, videoDescription, "", "", videoTags)
                     videoLists.add(video)
                 }
-                _videoList.value = videoLists
+
+                // Fetch user details for each unique user id
+                val usersRef = FirebaseDatabase.getInstance().getReference("users")
+                val userDisplayNameMap = mutableMapOf<String, String>()
+                val userProfileImageMap = mutableMapOf<String, String>()
+                val userProfileUrlMap = mutableMapOf<String, String>()
+
+                usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        // Collect user details
+                        for (userId in userIds) {
+                            val userDataSnapshot = dataSnapshot.child(userId)
+                            val userDisplayName = userDataSnapshot.child("displayName").getValue(String::class.java) ?: ""
+                            val userProfileImage = userDataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
+                            val userProfileUrl = userDataSnapshot.child("userProfileUrl").getValue(String::class.java) ?: ""
+
+                            userDisplayNameMap[userId] = userDisplayName
+                            userProfileImageMap[userId] = userProfileImage
+                            userProfileUrlMap[userId] = userProfileUrl
+                        }
+
+                        // Update videoList with fetched user details
+                        for (video in videoLists) {
+                            val userId = video.userId
+                            video.userDisplayName = userDisplayNameMap[userId] ?: ""
+                            video.userProfileImage = userProfileImageMap[userId] ?: ""
+                            video.userProfileUrl = userProfileUrlMap[userId] ?: ""
+                        }
+
+                        // Update _videoList LiveData
+                        _videoList.value = videoLists
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        // Handle failure
+                    }
+                })
             }
             .addOnFailureListener { exception ->
-                Log.e("error" ,"${exception.message} error")
+                Log.e("error", "${exception.message} error")
             }
     }
-
 
 
     fun fetchLikedVideos() {
@@ -92,7 +122,7 @@ class FirestoreViewModel : ViewModel() {
     private fun fetchVideosByIds(videoIds: List<String>) {
         val db = FirebaseFirestore.getInstance()
         val videosRef = db.collection("videos")
-
+        val userIds = mutableSetOf<String>()
         val videoLists = mutableListOf<Video>()
 
         for (videoId in videoIds) {
@@ -100,35 +130,62 @@ class FirestoreViewModel : ViewModel() {
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
                         val userId = document.getString("userId") ?: ""
-                        val userEmail = document.getString("userEmail") ?: ""
-                        val userDisplayName = document.getString("userDisplayName") ?: ""
-                        val uploadTimeTimestamp = document.getTimestamp("uploadTime") ?: Timestamp.now()
-                        val uploadTime = convertTimestampToDate(uploadTimeTimestamp)
                         val videoUrl = document.getString("videoUrl") ?: ""
                         val videoTitle = document.getString("title") ?: ""
-                        val userProfileUrl = document.getString("userProfileUrl") ?: ""
-                        val userPhotoUrl = document.getString("userPhotoUrl") ?: ""
                         val videoDescription = document.getString("description") ?: ""
                         val videoTags = document.get("videoTags") as? List<String> ?: listOf()
 
-
-                        val video = Video(videoId, userId, userEmail, userDisplayName, uploadTime, videoUrl, videoTitle, videoDescription, userProfileUrl, userPhotoUrl,videoTags)
+                        val video = Video(videoId, userId, "", videoUrl, videoTitle, videoDescription, "", "",videoTags)
                         videoLists.add(video)
-
+                        userIds.add(userId)
                         _videoLikedList.value = videoLists
                     }
                 }
                 .addOnFailureListener { exception ->
+                    // Handle any errors
                     println("Error getting video with ID $videoId: $exception")
                 }
         }
+
+        val usersRef = FirebaseDatabase.getInstance().getReference("users")
+        val userDisplayNameMap = mutableMapOf<String, String>()
+        val userProfileImageMap = mutableMapOf<String, String>()
+        val userProfileUrlMap = mutableMapOf<String, String>()
+
+        usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Collect user details
+                for (userId in userIds) {
+                    val userDataSnapshot = dataSnapshot.child(userId)
+                    val userDisplayName = userDataSnapshot.child("displayName").getValue(String::class.java) ?: ""
+                    val userProfileImage = userDataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
+                    val userProfileUrl = userDataSnapshot.child("userProfileUrl").getValue(String::class.java) ?: ""
+
+                    userDisplayNameMap[userId] = userDisplayName
+                    userProfileImageMap[userId] = userProfileImage
+                    userProfileUrlMap[userId] = userProfileUrl
+                }
+
+                // Update videoList with fetched user details
+                for (video in videoLists) {
+                    val userId = video.userId
+                    video.userDisplayName = userDisplayNameMap[userId] ?: ""
+                    video.userProfileImage = userProfileImageMap[userId] ?: ""
+                    video.userProfileUrl = userProfileUrlMap[userId] ?: ""
+                }
+
+                // Update _videoList LiveData
+                _videoLikedList.value = videoLists
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle failure
+            }
+        })
+
     }
 
 }
-fun convertTimestampToDate(timestamp: Timestamp): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-    val date = Date(timestamp.seconds * 1000L + timestamp.nanoseconds / 1000000)
-    return sdf.format(date)
-}
+
 
 

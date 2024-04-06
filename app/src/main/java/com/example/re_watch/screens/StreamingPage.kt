@@ -13,12 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -30,8 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,10 +39,11 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.re_watch.CommentViewModel
 import com.example.re_watch.FirestoreViewModel
 import com.example.re_watch.LikeDislikeViewModel
-import com.example.re_watch.R
 import com.example.re_watch.components.CommentSection
 import com.example.re_watch.components.DescriptionBox
 import com.example.re_watch.components.VideoPlayer
@@ -52,7 +53,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.firebase.auth.FirebaseAuth
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun StreamingPage(navController: NavHostController, param: VideoData?) {
     val commentViewModel: CommentViewModel = viewModel()
@@ -65,12 +66,13 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
     val title = param?.videoTitle
     val description = param?.videoDescription
     val displayName = param?.userDisplayName
-    val userPhoto = param?.userPhoto
+    val userProfilePhoto = param?.userProfileImage
     val userProfileUrl = param?.userProfileUrl
-    val uploadTime = param?.uploadTime
     val uri = param?.videoUrl?.toUri()
+
     var viewModel: FirestoreViewModel = viewModel()
     var likeDislikeViewModel: LikeDislikeViewModel = viewModel()
+
     val userId = FirebaseAuth.getInstance().currentUser?.uid
     val context = (LocalContext.current as? Activity) ?: return
     val exoPlayer = remember {
@@ -100,13 +102,15 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                 Row(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.profilepng),
-                        contentDescription = "Profile Pic",
+
+                    GlideImage(
+                        model = userProfilePhoto,
+                        contentDescription = "ProfilePic",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .padding(5.dp)
-                            .size(70.dp),
-                        tint = Color.Unspecified
+                            .size(70.dp)
+                            .clip(CircleShape),
                     )
                     Column(
                         modifier = Modifier.padding(start = 7.dp, top = 10.dp),
@@ -221,6 +225,11 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
         }
     }
 }
+
+
+
+
+
 
 
 

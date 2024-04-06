@@ -94,9 +94,11 @@ dependencies {
     //permissions
     implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
 
-    //video thumbnail
+    //video thumbnail or image picker
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     implementation ("com.github.bumptech.glide:compose:1.0.0-alpha.1")
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
 
     //json
     implementation ("com.google.code.gson:gson:2.10")

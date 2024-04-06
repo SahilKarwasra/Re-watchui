@@ -126,14 +126,13 @@ fun HomeScreen(navController: NavHostController) {
 
                 items(videoList) { video ->
                     VideoCard(video.userDisplayName, video.videoTitle, video.videoUrl, onClick = {
-                        Log.d("videoList", "video card item clicked${video.videoDescription}")
+                        Log.d("videoList", "video card item clicked${video.userDisplayName}")
                         val videodata =
                             VideoData(
                                 userDisplayName = video.userDisplayName,
-                                uploadTime =  video.uploadTime,
                                 videoUrl =  Uri.encode(video.videoUrl),
-                                userPhoto = video.userPhotoUrl,
-                                userProfileUrl = video.userProfileUrl,
+                                userProfileImage = Uri.encode(video.userProfileImage),
+                                userProfileUrl = Uri.encode(video.userProfileUrl),
                                 videoTitle = video.videoTitle,
                                 videoDescription = video.videoDescription,
                                 videoId = video.videoId
