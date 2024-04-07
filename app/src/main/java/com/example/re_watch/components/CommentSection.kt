@@ -57,10 +57,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
-
-
-
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun CommentSection(commentViewModel: CommentViewModel) {
@@ -85,11 +81,11 @@ fun CommentSection(commentViewModel: CommentViewModel) {
         onClick = {
             expanded = !expanded
         }
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .padding(5.dp),
-            )
+        )
         {
             Row(modifier = Modifier.padding(start = 8.dp, top = 5.dp)) {
 
@@ -121,12 +117,12 @@ fun CommentSection(commentViewModel: CommentViewModel) {
                         contentDescription = "ProfilePic",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .padding(start = 10.dp,)
+                            .padding(start = 10.dp)
                             .size(30.dp)
                             .clip(CircleShape),
 
                         )
-                    (if(firstComment?.comment.isNullOrEmpty())"Nice Video, Most Recommended and useful"  else firstComment?.comment)?.let {
+                    (if (firstComment?.comment.isNullOrEmpty()) "No Comments Yet" else firstComment?.comment)?.let {
                         Text(
                             text = it,
                             modifier = Modifier
@@ -152,8 +148,8 @@ fun CommentSection(commentViewModel: CommentViewModel) {
                     },
                     modifier = Modifier.height(heightOfBottomSheet.dp),
                     sheetState = sheetState,
-                ){
-                    Row (
+                ) {
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 10.dp, end = 10.dp),
@@ -167,9 +163,14 @@ fun CommentSection(commentViewModel: CommentViewModel) {
                             color = Color.Black
                         )
                         IconButton(
-                            content = { Icon(imageVector = Icons.Default.Close, contentDescription = "Close Comments Window")},
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close Comments Window"
+                                )
+                            },
                             modifier = Modifier
-                                .padding(start = 10.dp,)
+                                .padding(start = 10.dp)
                                 .size(30.dp),
                             onClick = {
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -180,12 +181,14 @@ fun CommentSection(commentViewModel: CommentViewModel) {
                             }
                         )
                     }
-                    Spacer(modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Gray)
-                        .height(1.dp))
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Gray)
+                            .height(1.dp)
+                    )
 
-                    user?.let { CommentSectionPopUp(commentViewModel,comments,user = it) }
+                    user?.let { CommentSectionPopUp(commentViewModel, comments, user = it) }
                 }
 
             }
@@ -195,18 +198,22 @@ fun CommentSection(commentViewModel: CommentViewModel) {
 
 
 @Composable
-fun CommentSectionPopUp(commentViewModel: CommentViewModel, comments: MutableList<Comment>,user: FirebaseUser) {
+fun CommentSectionPopUp(
+    commentViewModel: CommentViewModel,
+    comments: MutableList<Comment>,
+    user: FirebaseUser
+) {
 
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-        LazyColumn(modifier = Modifier.padding(bottom = 90.dp, top = 10.dp)){
+        LazyColumn(modifier = Modifier.padding(bottom = 90.dp, top = 10.dp)) {
             items(comments) { comment ->
 
                 CommentItemRow(comment)
             }
         }
 
-        InputCommentTextField( modifier = Modifier,commentViewModel,user = user)
+        InputCommentTextField(modifier = Modifier, commentViewModel, user = user)
     }
 
 }
@@ -220,7 +227,7 @@ fun InputCommentTextField(
 ) {
     val profileImage = user.photoUrl
 
-    Row(modifier = modifier){
+    Row(modifier = modifier) {
         GlideImage(
             model = profileImage,
             contentDescription = "ProfilePic",
@@ -231,10 +238,10 @@ fun InputCommentTextField(
                 .clip(CircleShape),
 
             )
-        Box(modifier = Modifier, contentAlignment = Alignment.TopEnd){
+        Box(modifier = Modifier, contentAlignment = Alignment.TopEnd) {
             OutlinedTextField(
                 value = viewModel.commentUIState.value.comment,
-                onValueChange = {viewModel.onEvent(CommentUIEvent.CommentChanged(it))},
+                onValueChange = { viewModel.onEvent(CommentUIEvent.CommentChanged(it)) },
                 modifier = Modifier
                     .padding(top = 5.dp, end = 35.dp)
                     .width(270.dp),
@@ -247,7 +254,7 @@ fun InputCommentTextField(
                         )
                     )
                 },
-                )
+            )
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.Send,
                 contentDescription = "Post Comment",
@@ -276,11 +283,11 @@ fun CommentItemRow(commentItem: Comment) {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .padding(start = 10.dp, top = 10.dp)
-                .size(30.dp)
+                .size(70.dp)
                 .clip(CircleShape),
 
-        )
-        Column{
+            )
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -304,7 +311,7 @@ fun CommentItemRow(commentItem: Comment) {
             }
             Text(
                 text = commentItem.comment,
-                modifier = Modifier.padding( start = 10.dp, end = 50.dp),
+                modifier = Modifier.padding(start = 10.dp, end = 50.dp),
                 color = Color.Black
             )
             Row(
