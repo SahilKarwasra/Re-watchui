@@ -6,4 +6,6 @@ data class VideoData(
     val videoUrl: String,
     val userProfileImage: String,
     val userProfileUrl: String,
+    val like:String,
+    val dislike:String,
 )

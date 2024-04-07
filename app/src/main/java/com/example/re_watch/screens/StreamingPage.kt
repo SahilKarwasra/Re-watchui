@@ -3,7 +3,6 @@ package com.example.re_watch.screens
 import VideoData
 import android.app.Activity
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -69,9 +67,12 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
     val userProfilePhoto = param?.userProfileImage
     val userProfileUrl = param?.userProfileUrl
     val uri = param?.videoUrl?.toUri()
+    val likes = param?.like
+    val dislike = param?.dislike
+
 
     var viewModel: FirestoreViewModel = viewModel()
-    var likeDislikeViewModel: LikeDislikeViewModel = viewModel()
+    val likeDislikeViewModel: LikeDislikeViewModel = viewModel()
 
     val userId = FirebaseAuth.getInstance().currentUser?.uid
     val context = (LocalContext.current as? Activity) ?: return
@@ -166,7 +167,13 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = likeDislikeViewModel.likes.value,
+                                text =
+                                (if(likeDislikeViewModel.likes.value.isNullOrEmpty()){
+                                    likes
+                                }else{
+                                    likeDislikeViewModel.likes.value
+                                })!!
+                                ,
                                 style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                                 modifier = Modifier.padding(top = 5.dp),
                                 color = MaterialTheme.colorScheme.onBackground
@@ -200,7 +207,12 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = likeDislikeViewModel.dislikes.value,
+                                text =
+                                (if(likeDislikeViewModel.dislikes.value.isNullOrEmpty()){
+                                    dislike
+                                }else{
+                                    likeDislikeViewModel.dislikes.value
+                                })!!,
                                 style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                                 modifier = Modifier.padding(top = 5.dp),
                                 color = MaterialTheme.colorScheme.onBackground

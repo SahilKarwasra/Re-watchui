@@ -14,6 +14,8 @@ class LikeDislikeViewModel : ViewModel() {
     var likes = mutableStateOf("")
     var dislikes = mutableStateOf("")
 
+
+
     suspend fun hasUserInteracted(userId: String, videoId: String): String? {
         val querySnapshot = db.collection("userActions")
             .whereEqualTo("userId", userId)

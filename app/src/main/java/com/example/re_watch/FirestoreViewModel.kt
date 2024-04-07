@@ -21,7 +21,9 @@ data class Video(
     var videoDescription: String,
     var userProfileUrl: String,
     var userProfileImage: String,
-    var videotags: List<String>
+    var videotags: List<String>,
+    var likes: String,
+    var dislikes: String,
 )
 
 class FirestoreViewModel : ViewModel() {
@@ -50,10 +52,12 @@ class FirestoreViewModel : ViewModel() {
                     val videoTitle = document.getString("title") ?: ""
                     val videoDescription = document.getString("description") ?: ""
                     val videoTags = document.get("videoTags") as? List<String> ?: listOf()
+                    val likes = document.getString("like") ?:"0"
+                    val dislikes = document.getString("dislike") ?:"0"
 
                     userIds.add(userId)
 
-                    val video = Video(videoId, userId, "", videoUrl, videoTitle, videoDescription, "", "", videoTags)
+                    val video = Video(videoId, userId, "", videoUrl, videoTitle, videoDescription, "", "", videoTags,likes,dislikes)
                     videoLists.add(video)
                 }
 
@@ -134,8 +138,11 @@ class FirestoreViewModel : ViewModel() {
                         val videoTitle = document.getString("title") ?: ""
                         val videoDescription = document.getString("description") ?: ""
                         val videoTags = document.get("videoTags") as? List<String> ?: listOf()
+                        val likes = document.getString("like") ?:"0"
+                        val dislikes = document.getString("dislike") ?:"0"
 
-                        val video = Video(videoId, userId, "", videoUrl, videoTitle, videoDescription, "", "",videoTags)
+
+                        val video = Video(videoId, userId, "", videoUrl, videoTitle, videoDescription, "", "",videoTags,likes,dislikes)
                         videoLists.add(video)
                         userIds.add(userId)
                         _videoLikedList.value = videoLists

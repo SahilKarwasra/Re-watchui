@@ -23,8 +23,8 @@ class VideoPickerViewModel : ViewModel() {
 
     var uploadUIState = mutableStateOf(UploadUiState())
 
-
     var uploadInProgress = mutableStateOf(false)
+    var uploadProgress = mutableStateOf(0)
 
     private lateinit var context: Context
 
@@ -69,6 +69,7 @@ class VideoPickerViewModel : ViewModel() {
 
 
     fun uploadVideo() {
+        uploadInProgress.value = true
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val userEmail = FirebaseAuth.getInstance().currentUser?.email ?: return
         val userDisplayName = FirebaseAuth.getInstance().currentUser?.displayName ?: "Unknown"
@@ -85,7 +86,11 @@ class VideoPickerViewModel : ViewModel() {
         val storageReference = FirebaseStorage.getInstance().reference
         val videoRef: StorageReference = storageReference.child("videos/${UUID.randomUUID()}")
 
-
+        val uploadTask = videoRef.putFile(uri)
+        uploadTask.addOnProgressListener { taskSnapshot ->
+            val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
+            uploadProgress.value = progress
+        }
         val db = FirebaseFirestore.getInstance()
         val videoInfo = hashMapOf(
             "userId" to userId,
@@ -102,7 +107,7 @@ class VideoPickerViewModel : ViewModel() {
         Log.d("Upload", "Uri.parse(uri.value)")
 
         // Upload video to Firebase Storage
-        videoRef.putFile(uri)
+        uploadTask
             .addOnSuccessListener { taskSnapshot ->
 
                 Toast.makeText(

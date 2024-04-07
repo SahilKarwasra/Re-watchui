@@ -135,7 +135,9 @@ fun HomeScreen(navController: NavHostController) {
                                 userProfileUrl = Uri.encode(video.userProfileUrl),
                                 videoTitle = video.videoTitle,
                                 videoDescription = video.videoDescription,
-                                videoId = video.videoId
+                                videoId = video.videoId,
+                                like = video.likes,
+                                dislike = video.dislikes
 
                             )
 
