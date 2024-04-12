@@ -79,7 +79,7 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
                     modifier = Modifier
                         .size(30.dp)
                         .clickable {
-
+                            navController.popBackStack()
                         }
                 )
             },
