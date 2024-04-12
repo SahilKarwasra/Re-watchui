@@ -132,6 +132,7 @@ fun LikedScreen(navController: NavHostController) {
                         val videoData =
                             VideoData(
                                 userDisplayName = video.userDisplayName,
+                                userID = video.userId,
                                 videoUrl =  Uri.encode(video.videoUrl),
                                 userProfileImage = Uri.encode(video.userProfileImage),
                                 userProfileUrl = Uri.encode(video.userProfileUrl),

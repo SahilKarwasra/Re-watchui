@@ -283,7 +283,7 @@ fun CommentItemRow(commentItem: Comment) {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .padding(start = 10.dp, top = 10.dp)
-                .size(70.dp)
+                .size(30.dp)
                 .clip(CircleShape),
 
             )

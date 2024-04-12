@@ -130,6 +130,7 @@ fun HomeScreen(navController: NavHostController) {
                         val videodata =
                             VideoData(
                                 userDisplayName = video.userDisplayName,
+                                userID = video.userId,
                                 videoUrl =  Uri.encode(video.videoUrl),
                                 userProfileImage = Uri.encode(video.userProfileImage),
                                 userProfileUrl = Uri.encode(video.userProfileUrl),
@@ -138,7 +139,6 @@ fun HomeScreen(navController: NavHostController) {
                                 videoId = video.videoId,
                                 like = video.likes,
                                 dislike = video.dislikes
-
                             )
 
                         val videoDataJson = Gson().toJson(videodata)

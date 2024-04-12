@@ -1,7 +1,7 @@
 package com.example.re_watch.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,33 +9,52 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.re_watch.R
+import com.example.re_watch.UserDetailViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun ChannelScreen() {
+fun ChannelScreen(navController: NavHostController, userId: String, userSlug: String) {
+    val viewModel: UserDetailViewModel = viewModel()
+    val userDetails by viewModel.userDetails.observeAsState(initial = null)
+    val userName = userDetails?.userDisplayName
+    val userProfileImage = userDetails?.userProfileImage
+    val userProfileUrl = userDetails?.userProfileUrl
+    Log.d("user",userSlug)
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchUserDetails(userId,userSlug)
+    }
+
     Column {
         TopAppBar(
             modifier = Modifier
@@ -71,21 +90,24 @@ fun ChannelScreen() {
             ),
         )
         Row {
-            Icon(
-                painter = painterResource(id = R.drawable.defaultprofilepic),
+
+            GlideImage(
+                model = userProfileImage,
                 contentDescription = "Profile Pic",
-                tint = Color.Unspecified,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .padding(start = 20.dp, top = 30.dp)
-                    .size(110.dp)
+                    .size(110.dp).clip(CircleShape)
             )
             Column {
-                Text(
-                    text = "Username",
-                    fontSize = 28.sp,
-                    color = Color(0xFF999BAD),
-                    modifier = Modifier.padding(start = 20.dp, top = 40.dp)
-                )
+                userName?.let {
+                    Text(
+                        text = it,
+                        fontSize = 28.sp,
+                        color = Color(0xFF999BAD),
+                        modifier = Modifier.padding(start = 20.dp, top = 40.dp)
+                    )
+                }
                 Text(
                     text = "12 Videos",
                     modifier = Modifier.padding(start = 20.dp, top = 10.dp),
@@ -139,5 +161,5 @@ fun ChannelScreen() {
 @Preview(showSystemUi = true)
 @Composable
 fun ChannelScreenPreview() {
-    ChannelScreen()
+
 }

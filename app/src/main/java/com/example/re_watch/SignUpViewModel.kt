@@ -13,6 +13,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.database
+import com.google.firebase.firestore.FirebaseFirestore
 
 data class User(
     val displayName: String,
@@ -126,6 +127,8 @@ class SignUpViewModel() : ViewModel() {
                                 }
                             }
 
+                        userId?.let { storeUserData("@${displayName.lowercase()}", it) }
+
                         navigateToHomeScreen(navController)
                     } else {
                         Log.d("Signup", "User creation failed: ${task.exception?.message}")
@@ -173,6 +176,33 @@ class SignUpViewModel() : ViewModel() {
             .addOnFailureListener { exception ->
                 // Handle error
                 Log.d("Signup", "Error saving user data: $exception")
+            }
+    }
+
+    fun storeUserData(userSlug: String, userId: String) {
+        // Reference to the Firestore database
+        val db = FirebaseFirestore.getInstance()
+
+        val userSlagCollection = db.collection("userSlag")
+
+        // Create a document with the user slug as the document ID
+        val documentRef = userSlagCollection.document(userSlug)
+
+        // Data to be stored in the document
+        val userData = hashMapOf(
+            "userId" to userId
+        )
+
+        // Set the data in the document
+        documentRef
+            .set(userData)
+            .addOnSuccessListener {
+                // Document was successfully written
+                println("User data stored successfully for $userSlug")
+            }
+            .addOnFailureListener { e ->
+                // Error handling
+                println("Error storing user data: ${e.message}")
             }
     }
 

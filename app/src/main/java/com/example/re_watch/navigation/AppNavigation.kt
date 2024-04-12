@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.example.re_watch.screens.ChannelScreen
 import com.example.re_watch.screens.HomeScreen
 import com.example.re_watch.screens.LikedScreen
 import com.example.re_watch.screens.LoginScreen
@@ -57,7 +59,6 @@ fun AppNavigation() {
 
             val videoData = Gson().fromJson(backStackEntry.arguments?.getString("videoDataJson") ?: "", VideoData::class.java)
 
-
             StreamingPage(navController = navController, param = videoData)
         }
         composable(AppScreens.LikedScreen.route) {
@@ -69,6 +70,30 @@ fun AppNavigation() {
         composable(AppScreens.SettingScreen.route) {
             SettingsScreen(navController = navController)
         }
+        composable("${AppScreens.ChannelScreen.route}/{userId}",
+            deepLinks =
+            listOf(
+                navDeepLink {
+                uriPattern = "https://rewatch.com/user/{argument}"
+            }),
+        ){
+            val userId = it.arguments?.getString("userId") ?: ""
+            val userSlug = it.arguments?.getString("argument") ?: ""
+            ChannelScreen(navController = navController, userId = userId,userSlug)
+        }
+        composable(
+            route = "${AppScreens.ChannelScreen.route}/{userId}",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://rewatch.online/{user}/{userSlug}"
+                }
+            )
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val userSlug = backStackEntry.arguments?.getString("userSlug") ?: ""
+            ChannelScreen(navController = navController, userId = userId, userSlug = userSlug)
+        }
+
 
 
     }
