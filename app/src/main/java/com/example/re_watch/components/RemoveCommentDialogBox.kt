@@ -79,6 +79,6 @@ fun RemoveCommentDialogBox() {
 
 @Preview(showSystemUi = true)
 @Composable
-fun removecommentprev() {
+fun Removecommentprev() {
     RemoveCommentDialogBox()
 }
