@@ -1,6 +1,5 @@
 package com.example.re_watch
 
-import android.util.Log
 import android.view.SurfaceView
 import android.view.TextureView
 import android.view.View
@@ -115,7 +114,7 @@ fun Media(
     keepContentOnPlayerReset: Boolean = false,
     useArtwork: Boolean = true,
     defaultArtworkPainter: Painter? = null,
-    subtitles: @Composable ((CueGroup) -> Unit)? = null, // TODO
+    subtitles: @Composable ((CueGroup) -> Unit)? = null,
     showBuffering: ShowBuffering = ShowBuffering.Never,
     buffering: @Composable (() -> Unit)? = null,
     errorMessage: @Composable ((PlaybackException) -> Unit)? = null,
@@ -323,7 +322,6 @@ private fun VideoSurface(
             DisposableEffect(Unit) {
                 onDispose {
                     (videoView.tag as? Player)?.clearVideoView(videoView)
-                    Log.d("dispose","dispose fun called")
                 }
             }
         }

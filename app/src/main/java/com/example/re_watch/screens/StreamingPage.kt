@@ -128,14 +128,14 @@ fun StreamingPage(navController: NavHostController, param: VideoData?) {
         systemUiController.isNavigationBarVisible = !isLandscape
     }
 
-
     var rememberedMediaItemIdAndPosition: Pair<String, Long>? by remember { mutableStateOf(null) }
     val player by rememberManagedExoPlayer()
     DisposableEffect(player, playWhenReady) {
         player?.playWhenReady = playWhenReady
         onDispose {}
     }
-    val mediaItem = remember(url)  { MediaItem.Builder().setMediaId(url).setUri(url).build() }
+
+    val mediaItem = remember(url) { MediaItem.Builder().setMediaId(url).setUri(url).build() }
     DisposableEffect(mediaItem, player) {
         player?.run {
             setMediaItem(mediaItem)
