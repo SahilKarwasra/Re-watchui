@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,12 +50,11 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
     val userName = userDetails?.userDisplayName
     val userProfileImage = userDetails?.userProfileImage
     val userProfileUrl = userDetails?.userProfileUrl
-    Log.d("user",userSlug)
+    Log.d("user", userSlug)
 
     LaunchedEffect(Unit) {
-        viewModel.fetchUserDetails(userId,userSlug)
+        viewModel.fetchUserDetails(userId, userSlug)
     }
-
     Column {
         TopAppBar(
             modifier = Modifier
@@ -79,7 +79,7 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
                     modifier = Modifier
                         .size(30.dp)
                         .clickable {
-
+                            navController.popBackStack()
                         }
                 )
             },
@@ -89,74 +89,92 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
                 actionIconContentColor = Color(0xFFFCFCFC)
             ),
         )
-        Row {
 
-            GlideImage(
-                model = userProfileImage,
-                contentDescription = "Profile Pic",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(start = 20.dp, top = 30.dp)
-                    .size(110.dp).clip(CircleShape)
-            )
-            Column {
-                userName?.let {
-                    Text(
-                        text = it,
-                        fontSize = 28.sp,
-                        color = Color(0xFF999BAD),
-                        modifier = Modifier.padding(start = 20.dp, top = 40.dp)
+        LazyColumn {
+            item {
+                Row {
+                    GlideImage(
+                        model = userProfileImage,
+                        contentDescription = "Profile Pic",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .padding(start = 20.dp, top = 30.dp)
+                            .size(110.dp)
+                            .clip(CircleShape)
                     )
+                    Column {
+                        userName?.let {
+                            Text(
+                                text = it,
+                                fontSize = 28.sp,
+                                color = Color(0xFF999BAD),
+                                modifier = Modifier.padding(start = 20.dp, top = 40.dp)
+                            )
+                        }
+                        Text(
+                            text = "12 Videos",
+                            modifier = Modifier.padding(start = 20.dp, top = 10.dp),
+                            fontSize = 16.sp,
+                            color = Color(0xFF87979E),
+                        )
+                    }
                 }
+            }
+
+            item {
                 Text(
-                    text = "12 Videos",
-                    modifier = Modifier.padding(start = 20.dp, top = 10.dp),
-                    fontSize = 16.sp,
-                    color = Color(0xFF87979E),
+                    text = "Videos",
+                    fontSize = 28.sp,
+                    modifier = Modifier
+                        .padding(start = 20.dp, top = 40.dp),
+                    color = Color(0xFF6B7E8D),
                 )
+            }
+
+            items(10) { index ->
+                VideoItem(index + 1)
             }
         }
-        Text(
-            text = "Videos",
-            fontSize = 28.sp,
+
+    }
+}
+
+@Composable
+fun VideoItem(index: Int) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.dumythumb),
+            contentDescription = "Thumbnail",
+            tint = Color.Unspecified,
             modifier = Modifier
-                .padding(start = 20.dp, top = 40.dp),
-            color = Color(0xFF6B7E8D),
+                .padding(start = 9.dp, top = 30.dp)
+                .size(width = 200.dp, height = 100.dp)
+                .aspectRatio(2f)
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.dumythumb),
-                contentDescription = "Thumbnail",
-                tint = Color.Unspecified,
+        Column {
+            Text(
+                text = "Pubg Chicken Dinner",
+                fontSize = 20.sp,
                 modifier = Modifier
-                    .padding(start = 9.dp, top = 30.dp)
-                    .size(width = 200.dp, height = 100.dp)
-                    .aspectRatio(2f)
+                    .padding(start = 5.dp, top = 30.dp)
+                    .fillMaxWidth(),
+                color = Color(0xFF6B7E8D),
+                maxLines = 4,
             )
-            Column {
-                Text(
-                    text = "Pubg Chicken Dinner",
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                        .padding(start = 5.dp, top = 30.dp)
-                        .fillMaxWidth(),
-                    color = Color(0xFF6B7E8D),
-                    maxLines = 4,
-                )
-                Text(
-                    text = "Upload date",
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .align(Alignment.End),
-                    color = Color(0xFF6B7E8D)
-                )
-            }
+            Text(
+                text = "Upload date",
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .padding(start = 5.dp)
+                    .align(Alignment.End),
+                color = Color(0xFF6B7E8D)
+            )
         }
     }
 }
+
 
 @Preview(showSystemUi = true)
 @Composable
