@@ -114,7 +114,11 @@ fun RemoveVideoScreen(navController: NavHostController) {
                         like = video.likes,
                         dislike = video.dislikes
                     )
-                AdvancedVideoCard(username = video.userProfileUrl, title = video.videoTitle, videoUrl = video.videoUrl,videoData = videoData) {
+                AdvancedVideoCard(username = video.userProfileUrl, title = video.videoTitle, videoUrl = video.videoUrl,
+                    onDeleteClicked ={
+                        viewModel.deleteVideo(videoId = video.videoId, video.userId)
+                        viewModel.removeItem(videoList.indexOf(video))
+                    } , onEditClicked = {}) {
 
                     val videoDataJson = Gson().toJson(videoData)
                     navController.navigate(route = "${AppScreens.StreamingPage.route}/$videoDataJson")

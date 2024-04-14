@@ -39,6 +39,14 @@ class FirestoreViewModel : ViewModel() {
     private val _videoByUserList = MutableLiveData<List<Video>>()
     val userVideoList: LiveData<List<Video>> = _videoByUserList
 
+    fun removeItem(indexToRemove: Int) {
+        val currentList = _videoByUserList.value.orEmpty().toMutableList()
+        if (indexToRemove in currentList.indices) {
+            currentList.removeAt(indexToRemove)
+            _videoByUserList.value = currentList
+        }
+    }
+
     fun fetchAllVideosFromFirestore() {
 
         db.collection("videos")
@@ -55,12 +63,24 @@ class FirestoreViewModel : ViewModel() {
                     val videoTitle = document.getString("title") ?: ""
                     val videoDescription = document.getString("description") ?: ""
                     val videoTags = document.get("videoTags") as? List<String> ?: listOf()
-                    val likes = document.getString("like") ?:"0"
-                    val dislikes = document.getString("dislike") ?:"0"
+                    val likes = document.getString("like") ?: "0"
+                    val dislikes = document.getString("dislike") ?: "0"
 
                     userIds.add(userId)
 
-                    val video = Video(videoId, userId, "", videoUrl, videoTitle, videoDescription, "", "", videoTags,likes,dislikes)
+                    val video = Video(
+                        videoId,
+                        userId,
+                        "",
+                        videoUrl,
+                        videoTitle,
+                        videoDescription,
+                        "",
+                        "",
+                        videoTags,
+                        likes,
+                        dislikes
+                    )
                     videoLists.add(video)
                 }
 
@@ -75,9 +95,14 @@ class FirestoreViewModel : ViewModel() {
                         // Collect user details
                         for (userId in userIds) {
                             val userDataSnapshot = dataSnapshot.child(userId)
-                            val userDisplayName = userDataSnapshot.child("displayName").getValue(String::class.java) ?: ""
-                            val userProfileImage = userDataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
-                            val userProfileUrl = userDataSnapshot.child("userProfileUrl").getValue(String::class.java) ?: ""
+                            val userDisplayName =
+                                userDataSnapshot.child("displayName").getValue(String::class.java)
+                                    ?: ""
+                            val userProfileImage =
+                                userDataSnapshot.child("profileImage").getValue(String::class.java)
+                                    ?: ""
+                            val userProfileUrl = userDataSnapshot.child("userProfileUrl")
+                                .getValue(String::class.java) ?: ""
 
                             userDisplayNameMap[userId] = userDisplayName
                             userProfileImageMap[userId] = userProfileImage
@@ -141,11 +166,23 @@ class FirestoreViewModel : ViewModel() {
                         val videoTitle = document.getString("title") ?: ""
                         val videoDescription = document.getString("description") ?: ""
                         val videoTags = document.get("videoTags") as? List<String> ?: listOf()
-                        val likes = document.getString("like") ?:"0"
-                        val dislikes = document.getString("dislike") ?:"0"
+                        val likes = document.getString("like") ?: "0"
+                        val dislikes = document.getString("dislike") ?: "0"
 
 
-                        val video = Video(videoId, userId, "", videoUrl, videoTitle, videoDescription, "", "",videoTags,likes,dislikes)
+                        val video = Video(
+                            videoId,
+                            userId,
+                            "",
+                            videoUrl,
+                            videoTitle,
+                            videoDescription,
+                            "",
+                            "",
+                            videoTags,
+                            likes,
+                            dislikes
+                        )
                         videoLists.add(video)
                         userIds.add(userId)
                         _videoLikedList.value = videoLists
@@ -167,9 +204,12 @@ class FirestoreViewModel : ViewModel() {
                 // Collect user details
                 for (userId in userIds) {
                     val userDataSnapshot = dataSnapshot.child(userId)
-                    val userDisplayName = userDataSnapshot.child("displayName").getValue(String::class.java) ?: ""
-                    val userProfileImage = userDataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
-                    val userProfileUrl = userDataSnapshot.child("userProfileUrl").getValue(String::class.java) ?: ""
+                    val userDisplayName =
+                        userDataSnapshot.child("displayName").getValue(String::class.java) ?: ""
+                    val userProfileImage =
+                        userDataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
+                    val userProfileUrl =
+                        userDataSnapshot.child("userProfileUrl").getValue(String::class.java) ?: ""
 
                     userDisplayNameMap[userId] = userDisplayName
                     userProfileImageMap[userId] = userProfileImage
@@ -194,6 +234,7 @@ class FirestoreViewModel : ViewModel() {
         })
 
     }
+
     fun fetchVideosByUserId(userId: String?) {
         val userId = userId ?: ""
         val currentUser = FirebaseAuth.getInstance().currentUser
@@ -207,7 +248,7 @@ class FirestoreViewModel : ViewModel() {
             .get()
             .addOnSuccessListener { result ->
                 val videoLists = mutableListOf<Video>()
-                if(currUID == userId){
+                if (currUID == userId) {
                     for (document in result) {
                         val videoId = document.id
                         val videoUrl = document.getString("videoUrl") ?: ""
@@ -217,9 +258,21 @@ class FirestoreViewModel : ViewModel() {
                         val likes = document.getString("like") ?: "0"
                         val dislikes = document.getString("dislike") ?: "0"
 
-                        val video = Video(videoId, userId, displayName,  videoUrl, videoTitle, videoDescription, userProfileUrl, userProfileImage, videoTags, likes, dislikes)
+                        val video = Video(
+                            videoId,
+                            userId,
+                            displayName,
+                            videoUrl,
+                            videoTitle,
+                            videoDescription,
+                            userProfileUrl,
+                            userProfileImage,
+                            videoTags,
+                            likes,
+                            dislikes
+                        )
                         videoLists.add(video)
-                        Log.d("videoList","${videoLists.size}")
+                        Log.d("videoList", "${videoLists.size}")
                         _videoByUserList.value = videoLists
                     }
                 } else {
@@ -232,31 +285,49 @@ class FirestoreViewModel : ViewModel() {
                         val likes = document.getString("like") ?: "0"
                         val dislikes = document.getString("dislike") ?: "0"
 
-                        val video = Video(videoId, userId, "",  videoUrl, videoTitle, videoDescription, "", "", videoTags, likes, dislikes)
+                        val video = Video(
+                            videoId,
+                            userId,
+                            "",
+                            videoUrl,
+                            videoTitle,
+                            videoDescription,
+                            "",
+                            "",
+                            videoTags,
+                            likes,
+                            dislikes
+                        )
                         videoLists.add(video)
                     }
                     // Fetch user details
                     val usersRef = FirebaseDatabase.getInstance().getReference("users")
-                    usersRef.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            val userDisplayName = dataSnapshot.child("displayName").getValue(String::class.java) ?: ""
-                            val userProfileImage = dataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
-                            val userProfileUrl = dataSnapshot.child("userProfileUrl").getValue(String::class.java) ?: ""
+                    usersRef.child(userId)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                val userDisplayName =
+                                    dataSnapshot.child("displayName").getValue(String::class.java)
+                                        ?: ""
+                                val userProfileImage =
+                                    dataSnapshot.child("profileImage").getValue(String::class.java)
+                                        ?: ""
+                                val userProfileUrl = dataSnapshot.child("userProfileUrl")
+                                    .getValue(String::class.java) ?: ""
 
-                            for (video in videoLists) {
-                                video.userDisplayName = userDisplayName
-                                video.userProfileImage = userProfileImage
-                                video.userProfileUrl = userProfileUrl
+                                for (video in videoLists) {
+                                    video.userDisplayName = userDisplayName
+                                    video.userProfileImage = userProfileImage
+                                    video.userProfileUrl = userProfileUrl
+                                }
+
+                                // Update _videoList LiveData
+                                _videoByUserList.value = videoLists
                             }
 
-                            // Update _videoList LiveData
-                            _videoByUserList.value = videoLists
-                        }
+                            override fun onCancelled(databaseError: DatabaseError) {
 
-                        override fun onCancelled(databaseError: DatabaseError) {
-
-                        }
-                    })
+                            }
+                        })
                 }
             }
             .addOnFailureListener { exception ->
@@ -268,32 +339,62 @@ class FirestoreViewModel : ViewModel() {
     fun deleteVideo(videoId: String, userId: String) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val storage = FirebaseStorage.getInstance()
+        Log.d("delete", "$videoId")
+
         if (currentUser != null && currentUser.uid == userId) {
-            // User is authenticated and is the owner of the video
-            db.collection("videos").document(videoId)
-                .delete()
-                .addOnSuccessListener {
-                    // Video document deleted successfully
-                    // Now delete the corresponding video file from storage
+
+            getFileName(videoId) { filename ->
+                if (filename.isNotEmpty()) {
                     val storageRef = storage.reference
-                    val videoRef = storageRef.child("videos/$videoId.mp4")
+                    val videoRef = storageRef.child("videos/$filename")
                     videoRef.delete()
                         .addOnSuccessListener {
-                            // Video file deleted successfully
+                            Log.d("delete", "video Deleted: $filename")
+                            db.collection("videos").document(videoId).delete()
+                                .addOnSuccessListener {
+                                    Log.d("delete", "$videoId")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("delete", "delete error :: ${e.message}")
+                                }
                         }
                         .addOnFailureListener { e ->
-                            // Handle storage deletion failure
+                            Log.e("delete", "delete video from  error :: ${e.message} ++$filename")
                         }
+
+                } else {
+                    Log.e("delete","Failed to fetch or extract filename $filename.")
                 }
-                .addOnFailureListener { e ->
-                    // Handle firestore deletion failure
-                }
+            }
         } else {
-            // User is not authenticated or not the owner of the video, handle unauthorized deletion attempt
+            Log.e("delete", "unauthorized ::")
         }
     }
 
+    fun getFileName(videoId: String, callback: (String) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+        val videoRef = db.collection("videos").document(videoId)
+
+        videoRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val videoUrl = documentSnapshot.getString("videoUrl") ?: ""
+                    val filename = extractFilenameFromUrl(videoUrl)
+
+                    callback(filename)
+                } else {
+                    callback("") // Return an empty string if document does not exist
+                }
+            }
+            .addOnFailureListener { e ->
+
+                callback("")
+            }
+    }
+
+    fun extractFilenameFromUrl(videoUrl: String): String {
+        val parts = videoUrl.split("videos%2F")
+        val filenamePart = parts.getOrNull(1)
+        return filenamePart?.split("?")?.firstOrNull() ?: ""
+    }
 }
-
-
-
