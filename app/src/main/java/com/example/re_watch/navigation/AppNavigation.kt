@@ -1,6 +1,7 @@
 package com.example.re_watch.navigation
 
 import VideoData
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -30,8 +31,10 @@ fun AppNavigation() {
         navController = navController,
         startDestination =
         if (currentUser != null) {
+            Log.e("current","home screen")
             AppScreens.HomeScreen.route
         }else{
+            Log.e("current","welcome Screen")
             AppScreens.WelcomeScreen.route
         }
         ){
