@@ -66,7 +66,7 @@ class LoginViewModel() : ViewModel() {
     private fun validateLoginUIDataWithRules(){
         val emailResult = Validator.validateEmail(loginUIState.value.email)
 
-        val passwordResult = Validator.validatePassword(loginUIState.value.password)
+        val passwordResult = Validator.validatePassForLogin(loginUIState.value.password)
 
         loginUIState.value = loginUIState.value.copy(
             emailError = emailResult,

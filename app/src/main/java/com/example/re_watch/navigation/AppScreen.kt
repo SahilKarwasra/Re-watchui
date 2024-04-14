@@ -11,4 +11,5 @@ sealed class AppScreens(val route: String) {
     data object SearchScreen: AppScreens("search_screen")
     data object SettingScreen: AppScreens("setting_screen")
     data object ChannelScreen: AppScreens("channel_screen")
+    data object RemoveScreen: AppScreens("remove_screen")
 }

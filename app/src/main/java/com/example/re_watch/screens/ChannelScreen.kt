@@ -1,5 +1,7 @@
 package com.example.re_watch.screens
 
+import VideoData
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,8 +45,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.re_watch.FirestoreViewModel
 import com.example.re_watch.R
 import com.example.re_watch.UserDetailViewModel
+import com.example.re_watch.components.AdvancedVideoCard
+import com.example.re_watch.navigation.AppScreens
+import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -50,11 +60,30 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
     val userName = userDetails?.userDisplayName
     val userProfileImage = userDetails?.userProfileImage
     val userProfileUrl = userDetails?.userProfileUrl
-    Log.d("user", userSlug)
+    val userIdBySlug = viewModel.userIdget.value
+    val firestoreViewModel: FirestoreViewModel = viewModel()
+    var shouldFetchVideos by remember { mutableStateOf(false) }
 
+
+    val videoList by firestoreViewModel.userVideoList.observeAsState(initial = emptyList())
     LaunchedEffect(Unit) {
         viewModel.fetchUserDetails(userId, userSlug)
+        if(!userId.isEmpty()){
+            firestoreViewModel.fetchVideosByUserId(userId)
+            shouldFetchVideos = true
+            Log.d("userSlag","user id :  ${userId}")
+        }
     }
+    LaunchedEffect(!userIdBySlug.isEmpty()) {
+        if (!shouldFetchVideos && userIdBySlug.isNotEmpty()) {
+            firestoreViewModel.fetchVideosByUserId(userIdBySlug)
+            shouldFetchVideos = true
+            Log.d("userSlag","user id by slag :  ${userIdBySlug}")
+        }
+    }
+
+
+
     Column {
         TopAppBar(
             modifier = Modifier
@@ -131,8 +160,26 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
                 )
             }
 
-            items(10) { index ->
-                VideoItem(index + 1)
+            items(videoList) { video ->
+                val videoData =
+                    VideoData(
+                        userDisplayName = video.userDisplayName,
+                        userID = video.userId,
+                        videoUrl =  Uri.encode(video.videoUrl),
+                        userProfileImage = Uri.encode(video.userProfileImage),
+                        userProfileUrl = Uri.encode(video.userProfileUrl),
+                        videoTitle = video.videoTitle,
+                        videoDescription = video.videoDescription,
+                        videoId = video.videoId,
+                        like = video.likes,
+                        dislike = video.dislikes
+                    )
+                AdvancedVideoCard(username = video.userProfileUrl, title = video.videoTitle, videoUrl = video.videoUrl,videoData = videoData) {
+
+                    val videoDataJson = Gson().toJson(videoData)
+                    navController.navigate(route = "${AppScreens.StreamingPage.route}/$videoDataJson")
+                }
+
             }
         }
 

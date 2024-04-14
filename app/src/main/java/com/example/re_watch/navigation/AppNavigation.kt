@@ -13,6 +13,7 @@ import com.example.re_watch.screens.HomeScreen
 import com.example.re_watch.screens.LikedScreen
 import com.example.re_watch.screens.LoginScreen
 import com.example.re_watch.screens.ProfileScreen
+import com.example.re_watch.screens.RemoveVideoScreen
 import com.example.re_watch.screens.SearchScreen
 import com.example.re_watch.screens.SettingsScreen
 import com.example.re_watch.screens.SignUpScreen
@@ -93,7 +94,9 @@ fun AppNavigation() {
             val userSlug = backStackEntry.arguments?.getString("userSlug") ?: ""
             ChannelScreen(navController = navController, userId = userId, userSlug = userSlug)
         }
-
+        composable(AppScreens.RemoveScreen.route) {
+            RemoveVideoScreen(navController = navController)
+        }
 
 
     }

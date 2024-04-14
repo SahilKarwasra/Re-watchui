@@ -15,6 +15,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +43,12 @@ fun SignUpScreen(navController: NavHostController) {
 
     val signUpViewModel: SignUpViewModel = viewModel()
     signUpViewModel.setNavController(navController)
+
+    var isError = remember { mutableStateOf(false) }
+    var usernameShort = remember { mutableStateOf(false) }
+    var isEmailCheck = remember { mutableStateOf(false) }
+    var passwordLength = remember { mutableStateOf(false) }
+    var isprofileusernameCheck = remember { mutableStateOf(false) }
 
     Surface(
         color = Color(0xFF253334),
@@ -96,13 +104,41 @@ fun SignUpScreen(navController: NavHostController) {
                 )
 
 
-
+                CTextField(
+                    hint = "Profile User Name ",
+                    onValueChange = {
+                        val filteredText = it.replace(" ", "")
+                        signUpViewModel.onEvent(SignUpUIEvent.ProfileUsernameChanged(filteredText))},
+                    value = signUpViewModel.signUpUIState.value.profileUsername,
+                    keyboardtype = KeyboardType.Text
+                )
+                if(!signUpViewModel.signUpUIState.value.profileUsernameError || ( isprofileusernameCheck.value && signUpViewModel.signUpUIState.value.profileUsername.isEmpty() )){
+                    if(!signUpViewModel.signUpUIState.value.profileUsernameError){
+                        Text(
+                            text = "Profile username already exit",
+                            color = Color.Red
+                        )
+                    }
+                    else{
+                        Text(
+                            text = "Profile user name can't be null",
+                            color = Color.Red
+                        )
+                    }
+                }
                 CTextField(
                     hint = "User Name",
                     onValueChange = {signUpViewModel.onEvent(SignUpUIEvent.UsernameChanged(it))},
                     value = signUpViewModel.signUpUIState.value.username,
                     keyboardtype = KeyboardType.Text
                 )
+                if(usernameShort.value && !signUpViewModel.signUpUIState.value.usernameError){
+                    Text(
+                        text = "User name is too short",
+                        color = Color.Red
+                    )
+
+                }
 
                 CTextField(
                     hint = "Email Address",
@@ -110,30 +146,62 @@ fun SignUpScreen(navController: NavHostController) {
                     value = signUpViewModel.signUpUIState.value.email,
                     keyboardtype = KeyboardType.Email
                 )
+                if(isEmailCheck.value && !signUpViewModel.signUpUIState.value.emailError){
+                    Text(
+                        text = "recheck email",
+                        color = Color.Red
+                    )
+                }
+
                 CTextField(
                     hint = "Password",
-                    onValueChange = {signUpViewModel.onEvent(SignUpUIEvent.PasswordChanged(it))},
+                    onValueChange = {
+                        isError.value = it.contains(" ")
+                        signUpViewModel.onEvent(SignUpUIEvent.PasswordChanged(it))},
                     value = signUpViewModel.signUpUIState.value.password,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardtype = KeyboardType.Password
-
                 )
+                if((passwordLength.value && !signUpViewModel.signUpUIState.value.passwordError) || isError.value){
+
+                    if(isError.value){
+                        Text(
+                            text = "you can't use spaces in password",
+                            color = Color.Red
+                        )
+                    }
+                    else{
+                        Text(
+                            text = "password must be of 8 char",
+                            color = Color.Red
+                        )
+                    }
+                }
+
+
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 CButton(text = "Sign Up", onClick = {
-                    if(signUpViewModel.allValidationPassed.value){
+                    if(signUpViewModel.allValidationPassed.value && !isError.value && !signUpViewModel.signUpUIState.value.profileUsername.isEmpty()){
                         signUpViewModel.onEvent(SignUpUIEvent.SignUpButtonClicked)
+                        Log.d("error","button clicked")
                     }
                     else{
                         if(!signUpViewModel.signUpUIState.value.usernameError){
                             Log.d("error","check username")
+                            usernameShort.value = true
                         }
                         if(!signUpViewModel.signUpUIState.value.emailError){
                             Log.d("error","check email")
+                            isEmailCheck.value = true
                         }
                         if(!signUpViewModel.signUpUIState.value.passwordError){
                             Log.d("error","check password")
+                            passwordLength.value = true
+                        }
+                        if(signUpViewModel.signUpUIState.value.profileUsername.isEmpty()){
+                            isprofileusernameCheck.value = true
                         }
                     }
 

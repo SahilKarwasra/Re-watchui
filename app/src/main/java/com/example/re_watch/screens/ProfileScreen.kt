@@ -121,7 +121,7 @@ fun MainProfileScreen(navController: NavHostController) {
                     .clip(RoundedCornerShape(CornerSize(20.dp)))
                     .background(Color(0xFF31A5DA)),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Box(
                     modifier = Modifier
                         .padding(bottom = 10.dp, top = 10.dp)
@@ -209,7 +209,7 @@ fun MainProfileScreen(navController: NavHostController) {
                             )
                         }
                         Button(
-                            onClick = { /*TODO*/ },
+                            onClick = { navController.navigate(route = AppScreens.RemoveScreen.route)  },
                             shape = MaterialTheme.shapes.large,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF4372F1)

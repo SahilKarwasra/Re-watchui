@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
 
 data class Video(
@@ -28,15 +29,17 @@ data class Video(
 
 class FirestoreViewModel : ViewModel() {
 
-
+    val db = FirebaseFirestore.getInstance()
     private val _videoList = MutableLiveData<List<Video>>()
     val videoList: LiveData<List<Video>> = _videoList
 
     private val _videoLikedList = MutableLiveData<List<Video>>()
     val videoLikedList: LiveData<List<Video>> = _videoLikedList
 
+    private val _videoByUserList = MutableLiveData<List<Video>>()
+    val userVideoList: LiveData<List<Video>> = _videoByUserList
+
     fun fetchAllVideosFromFirestore() {
-        val db = FirebaseFirestore.getInstance()
 
         db.collection("videos")
             .get()
@@ -106,7 +109,7 @@ class FirestoreViewModel : ViewModel() {
 
     fun fetchLikedVideos() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val db = FirebaseFirestore.getInstance()
+
         val userActionsRef = db.collection("userActions")
 
         userActionsRef
@@ -124,7 +127,7 @@ class FirestoreViewModel : ViewModel() {
     }
 
     private fun fetchVideosByIds(videoIds: List<String>) {
-        val db = FirebaseFirestore.getInstance()
+
         val videosRef = db.collection("videos")
         val userIds = mutableSetOf<String>()
         val videoLists = mutableListOf<Video>()
@@ -190,6 +193,104 @@ class FirestoreViewModel : ViewModel() {
             }
         })
 
+    }
+    fun fetchVideosByUserId(userId: String?) {
+        val userId = userId ?: ""
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val currUID = currentUser?.uid
+        val displayName = currentUser?.displayName ?: ""
+        val userProfileUrl = "@${displayName.lowercase()}"
+        val userProfileImage = currentUser?.photoUrl.toString()
+
+        db.collection("videos")
+            .whereEqualTo("userId", userId)
+            .get()
+            .addOnSuccessListener { result ->
+                val videoLists = mutableListOf<Video>()
+                if(currUID == userId){
+                    for (document in result) {
+                        val videoId = document.id
+                        val videoUrl = document.getString("videoUrl") ?: ""
+                        val videoTitle = document.getString("title") ?: ""
+                        val videoDescription = document.getString("description") ?: ""
+                        val videoTags = document.get("videoTags") as? List<String> ?: listOf()
+                        val likes = document.getString("like") ?: "0"
+                        val dislikes = document.getString("dislike") ?: "0"
+
+                        val video = Video(videoId, userId, displayName,  videoUrl, videoTitle, videoDescription, userProfileUrl, userProfileImage, videoTags, likes, dislikes)
+                        videoLists.add(video)
+                        Log.d("videoList","${videoLists.size}")
+                        _videoByUserList.value = videoLists
+                    }
+                } else {
+                    for (document in result) {
+                        val videoId = document.id
+                        val videoUrl = document.getString("videoUrl") ?: ""
+                        val videoTitle = document.getString("title") ?: ""
+                        val videoDescription = document.getString("description") ?: ""
+                        val videoTags = document.get("videoTags") as? List<String> ?: listOf()
+                        val likes = document.getString("like") ?: "0"
+                        val dislikes = document.getString("dislike") ?: "0"
+
+                        val video = Video(videoId, userId, "",  videoUrl, videoTitle, videoDescription, "", "", videoTags, likes, dislikes)
+                        videoLists.add(video)
+                    }
+                    // Fetch user details
+                    val usersRef = FirebaseDatabase.getInstance().getReference("users")
+                    usersRef.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            val userDisplayName = dataSnapshot.child("displayName").getValue(String::class.java) ?: ""
+                            val userProfileImage = dataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
+                            val userProfileUrl = dataSnapshot.child("userProfileUrl").getValue(String::class.java) ?: ""
+
+                            for (video in videoLists) {
+                                video.userDisplayName = userDisplayName
+                                video.userProfileImage = userProfileImage
+                                video.userProfileUrl = userProfileUrl
+                            }
+
+                            // Update _videoList LiveData
+                            _videoByUserList.value = videoLists
+                        }
+
+                        override fun onCancelled(databaseError: DatabaseError) {
+
+                        }
+                    })
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("error", "${exception.message} error")
+            }
+    }
+
+
+    fun deleteVideo(videoId: String, userId: String) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val storage = FirebaseStorage.getInstance()
+        if (currentUser != null && currentUser.uid == userId) {
+            // User is authenticated and is the owner of the video
+            db.collection("videos").document(videoId)
+                .delete()
+                .addOnSuccessListener {
+                    // Video document deleted successfully
+                    // Now delete the corresponding video file from storage
+                    val storageRef = storage.reference
+                    val videoRef = storageRef.child("videos/$videoId.mp4")
+                    videoRef.delete()
+                        .addOnSuccessListener {
+                            // Video file deleted successfully
+                        }
+                        .addOnFailureListener { e ->
+                            // Handle storage deletion failure
+                        }
+                }
+                .addOnFailureListener { e ->
+                    // Handle firestore deletion failure
+                }
+        } else {
+            // User is not authenticated or not the owner of the video, handle unauthorized deletion attempt
+        }
     }
 
 }

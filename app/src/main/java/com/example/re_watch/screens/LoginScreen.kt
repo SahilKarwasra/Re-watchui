@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +39,9 @@ import com.example.re_watch.navigation.AppScreens
 @Composable
 fun LoginScreen(navController: NavHostController,) {
     val loginViewModel: LoginViewModel = viewModel()
+    var isEmailCheck = remember { mutableStateOf(false) }
+    var isPassCheck = remember { mutableStateOf(false) }
+
     loginViewModel.setNavController(navController, LocalContext.current)
     Surface(
         color = Color(0xFF253334),
@@ -115,6 +120,23 @@ fun LoginScreen(navController: NavHostController,) {
                     keyboardtype = KeyboardType.Password
                 )
 
+
+
+                if(isEmailCheck.value && !loginViewModel.loginUIState.value.emailError){
+                    Text(
+                        text = "recheck email",
+                        color = Color.Red
+                    )
+                }
+
+                if(isPassCheck.value && !loginViewModel.loginUIState.value.passwordError){
+                    Text(
+                        text = "Password cant be empty",
+                        color = Color.Red
+                    )
+                }
+
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 CButton(text = "Sign In", onClick = {
@@ -124,9 +146,13 @@ fun LoginScreen(navController: NavHostController,) {
                     else{
                         if(!loginViewModel.loginUIState.value.emailError){
                             Log.d("error","check email")
+                            isEmailCheck.value = true
                         }
                         if(!loginViewModel.loginUIState.value.passwordError){
                             Log.d("error","check password")
+                        }
+                        if(loginViewModel.loginUIState.value.password.isEmpty()){
+                            isPassCheck.value = true
                         }
                     }
                     })

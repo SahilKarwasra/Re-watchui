@@ -39,6 +39,11 @@ class SignUpViewModel() : ViewModel() {
 
     fun onEvent(event:SignUpUIEvent){
         when(event){
+            is SignUpUIEvent.ProfileUsernameChanged ->{
+                signUpUIState.value = signUpUIState.value.copy(
+                    profileUsername = event.profileUsername
+                )
+            }
             is SignUpUIEvent.UsernameChanged ->{
                 signUpUIState.value = signUpUIState.value.copy(
                     username = event.username
@@ -68,6 +73,11 @@ class SignUpViewModel() : ViewModel() {
 
 
     private fun validateSignupUIDataWithRules(){
+        Validator.validateProfileusername(signUpUIState.value.profileUsername){ exists ->
+            signUpUIState.value = signUpUIState.value.copy(
+                profileUsernameError = exists
+            )
+        }
         val usernameResult = Validator.validateUsername(signUpUIState.value.username)
 
         val emailResult = Validator.validateEmail(signUpUIState.value.email)
@@ -77,20 +87,22 @@ class SignUpViewModel() : ViewModel() {
         signUpUIState.value = signUpUIState.value.copy(
             emailError = emailResult,
             passwordError = passwordResult,
-            usernameError = usernameResult
+            usernameError = usernameResult,
 
         )
-        allValidationPassed.value = emailResult && passwordResult && usernameResult
+
+        allValidationPassed.value = emailResult && passwordResult && usernameResult && signUpUIState.value.profileUsernameError
     }
 
     fun createUserInFirebase(){
+        val profileUserName = signUpUIState.value.profileUsername
         val username = signUpUIState.value.username
         val email = signUpUIState.value.email
         val password = signUpUIState.value.password
         signUpInProgress.value = true
         Log.d("Signup","userName ${username}user ${email} is  ${password}")
 
-        if (email != null && email.isNotEmpty() && password != null && password.isNotEmpty() && username != null && username.isNotEmpty()) {
+        if (email != null && email.isNotEmpty() && password != null && password.isNotEmpty() && username != null && username.isNotEmpty() && profileUserName != null && profileUserName.isNotEmpty()) {
 
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
@@ -99,6 +111,7 @@ class SignUpViewModel() : ViewModel() {
                         val user = FirebaseAuth.getInstance().currentUser
                         val userId = user?.uid
                         val displayName = username
+                        val profileusername = profileUserName
 
                         val userData = user?.email?.let {
                             User(
@@ -108,7 +121,6 @@ class SignUpViewModel() : ViewModel() {
                                 profileImage = user.photoUrl.toString()
                             )
                         }
-
 
                         userId?.let { userData?.let { it1 -> saveUserData(userId = it, it1) } }
                         val profileUpdates = UserProfileChangeRequest.Builder()
@@ -127,7 +139,7 @@ class SignUpViewModel() : ViewModel() {
                                 }
                             }
 
-                        userId?.let { storeUserData("@${displayName.lowercase()}", it) }
+                        userId?.let { storeUserData("@${profileusername.lowercase()}", it) }
 
                         navigateToHomeScreen(navController)
                     } else {
