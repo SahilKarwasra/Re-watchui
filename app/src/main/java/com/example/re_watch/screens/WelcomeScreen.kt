@@ -1,7 +1,6 @@
 package com.example.re_watch.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +18,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -43,22 +41,6 @@ fun WelcomeScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        Column(
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(7.dp)
-        ) {
-            Text(
-                text = "Continue As a Guest",
-                fontWeight = FontWeight(400),
-                fontSize = 15.sp,
-                color = Color.White,
-                modifier = Modifier.clickable {
-                    navController.navigate(route = AppScreens.HomeScreen.route)
-                }
-            )
-        }
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

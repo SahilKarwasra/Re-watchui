@@ -70,7 +70,7 @@ fun SearchScreen(navController: NavHostController) {
                             modifier = Modifier
                                 .size(30.dp)
                                 .clickable {
-
+                                    navController.popBackStack()
                                 }
                         )
                         TextField(
