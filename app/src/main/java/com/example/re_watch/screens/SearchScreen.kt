@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Search
@@ -34,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -82,8 +85,15 @@ fun SearchScreen(navController: NavHostController) {
                                 unfocusedTextColor = Color(0xFFFFFFFF),
                                 focusedIndicatorColor = Color(0xFFBEC2C2),
                                 unfocusedIndicatorColor = Color(0xFFBEC2C2)
-                            )
-                            )
+                            ),
+                            maxLines = 1,
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                imeAction = ImeAction.Search // Set the IME action to Search
+                            ),
+                            keyboardActions = KeyboardActions {
+                                searchViewModel.searchVideos(searchQuery)
+                            }
+                        )
                     }
                 },
                 actions = {

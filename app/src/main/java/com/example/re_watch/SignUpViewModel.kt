@@ -117,7 +117,7 @@ class SignUpViewModel() : ViewModel() {
                             User(
                                 displayName = displayName,
                                 email = it,
-                                profileUrl = "test",
+                                profileUrl = "@${profileUserName.lowercase()}",
                                 profileImage = user.photoUrl.toString()
                             )
                         }

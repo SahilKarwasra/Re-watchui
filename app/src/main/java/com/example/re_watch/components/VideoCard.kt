@@ -104,6 +104,7 @@ fun AdvancedVideoCard(
     videoUrl: String,
     onDeleteClicked: () -> Unit,
     onEditClicked: () -> Unit,
+    remove: Boolean,
     onClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -159,6 +160,7 @@ fun AdvancedVideoCard(
                 modifier = Modifier.align(Alignment.Top)
             ) {
                 Column {
+                    if(remove){
 //                    DropdownMenuItem(
 //                        text = {
 //                            Row {
@@ -171,18 +173,19 @@ fun AdvancedVideoCard(
 //                            expanded = false
 //                        }
 //                    )
-                    DropdownMenuItem(
-                        text = {
-                            Row {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
-                                Text("Delete",Modifier.padding(start = 3.dp))
+                        DropdownMenuItem(
+                            text = {
+                                Row {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                    Text("Delete",Modifier.padding(start = 3.dp))
+                                }
+                            },
+                            onClick = {
+                                onDeleteClicked()
+                                expanded = false
                             }
-                        },
-                        onClick = {
-                            onDeleteClicked()
-                            expanded = false
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

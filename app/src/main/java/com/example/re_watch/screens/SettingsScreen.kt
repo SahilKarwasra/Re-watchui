@@ -173,7 +173,7 @@ fun ProfileSettingsContent(viewModel:ImageUploaderViewModel) {
             // Handle email update
         }
         ChangePasswordDialog()
-        LogoutSection()
+//        LogoutSection()
     }
 
     if (showDialog) {

@@ -41,6 +41,22 @@ fun WelcomeScreen(
             modifier = Modifier.fillMaxSize()
         )
 
+//        Column(
+//            horizontalAlignment = Alignment.End,
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(7.dp)
+//        ) {
+//            Text(
+//                text = "Continue As a Guest",
+//                fontWeight = FontWeight(400),
+//                fontSize = 15.sp,
+//                color = Color.White,
+//                modifier = Modifier.clickable {
+//                    navController.navigate(route = AppScreens.HomeScreen.route)
+//                }
+//            )
+//        }
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -240,8 +240,10 @@ class FirestoreViewModel : ViewModel() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val currUID = currentUser?.uid
         val displayName = currentUser?.displayName ?: ""
-        val userProfileUrl = "@${displayName.lowercase()}"
+        val userProfileUrl = "@${currentUser}"
         val userProfileImage = currentUser?.photoUrl.toString()
+
+        val usersRef = FirebaseDatabase.getInstance().getReference("users")
 
         db.collection("videos")
             .whereEqualTo("userId", userId)
@@ -272,9 +274,27 @@ class FirestoreViewModel : ViewModel() {
                             dislikes
                         )
                         videoLists.add(video)
-                        Log.d("videoList", "${videoLists.size}")
-                        _videoByUserList.value = videoLists
+
                     }
+                    usersRef.child(userId)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                                val userProfileUrl = dataSnapshot.child("profileUrl")
+                                    .getValue(String::class.java) ?: ""
+
+                                for (video in videoLists) {
+                                    video.userProfileUrl = userProfileUrl
+                                }
+                                Log.e("user", ":::$userProfileUrl")
+
+                                _videoByUserList.value = videoLists
+                            }
+
+                            override fun onCancelled(databaseError: DatabaseError) {
+
+                            }
+                        })
                 } else {
                     for (document in result) {
                         val videoId = document.id
@@ -301,7 +321,7 @@ class FirestoreViewModel : ViewModel() {
                         videoLists.add(video)
                     }
                     // Fetch user details
-                    val usersRef = FirebaseDatabase.getInstance().getReference("users")
+
                     usersRef.child(userId)
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -311,7 +331,7 @@ class FirestoreViewModel : ViewModel() {
                                 val userProfileImage =
                                     dataSnapshot.child("profileImage").getValue(String::class.java)
                                         ?: ""
-                                val userProfileUrl = dataSnapshot.child("userProfileUrl")
+                                val userProfileUrl = dataSnapshot.child("profileUrl")
                                     .getValue(String::class.java) ?: ""
 
                                 for (video in videoLists) {
@@ -319,6 +339,7 @@ class FirestoreViewModel : ViewModel() {
                                     video.userProfileImage = userProfileImage
                                     video.userProfileUrl = userProfileUrl
                                 }
+                                Log.e("user", ":::$userProfileUrl")
 
                                 // Update _videoList LiveData
                                 _videoByUserList.value = videoLists
@@ -383,7 +404,7 @@ class FirestoreViewModel : ViewModel() {
 
                     callback(filename)
                 } else {
-                    callback("") // Return an empty string if document does not exist
+                    callback("")
                 }
             }
             .addOnFailureListener { e ->

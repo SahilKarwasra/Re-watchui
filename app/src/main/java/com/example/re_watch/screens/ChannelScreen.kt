@@ -83,7 +83,6 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
     }
 
 
-
     Column {
         TopAppBar(
             modifier = Modifier
@@ -141,7 +140,7 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
                             )
                         }
                         Text(
-                            text = "12 Videos",
+                            text = "${videoList.size} Videos",
                             modifier = Modifier.padding(start = 20.dp, top = 10.dp),
                             fontSize = 16.sp,
                             color = Color(0xFF87979E),
@@ -174,8 +173,8 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
                         like = video.likes,
                         dislike = video.dislikes
                     )
-                AdvancedVideoCard(username = video.userProfileUrl, title = video.videoTitle, videoUrl = video.videoUrl, onDeleteClicked ={} , onEditClicked = {}) {
-
+                AdvancedVideoCard(username = video.userProfileUrl, title = video.videoTitle, videoUrl = video.videoUrl, onDeleteClicked ={} , remove = false, onEditClicked = {}) {
+                    Log.e("user", "${video.userProfileUrl}")
                     val videoDataJson = Gson().toJson(videoData)
                     navController.navigate(route = "${AppScreens.StreamingPage.route}/$videoDataJson")
                 }

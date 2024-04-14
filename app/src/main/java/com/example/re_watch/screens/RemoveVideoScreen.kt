@@ -81,7 +81,7 @@ fun RemoveVideoScreen(navController: NavHostController) {
                     modifier = Modifier
                         .size(30.dp)
                         .clickable {
-
+                            navController.popBackStack()
                         }
                 )
             },
@@ -118,7 +118,8 @@ fun RemoveVideoScreen(navController: NavHostController) {
                     onDeleteClicked ={
                         viewModel.deleteVideo(videoId = video.videoId, video.userId)
                         viewModel.removeItem(videoList.indexOf(video))
-                    } , onEditClicked = {}) {
+                    } ,
+                    remove = true, onEditClicked = {}) {
 
                     val videoDataJson = Gson().toJson(videoData)
                     navController.navigate(route = "${AppScreens.StreamingPage.route}/$videoDataJson")

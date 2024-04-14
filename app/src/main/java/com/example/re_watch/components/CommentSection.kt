@@ -19,9 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -311,33 +309,33 @@ fun CommentItemRow(commentItem: Comment) {
             }
             Text(
                 text = commentItem.comment,
-                modifier = Modifier.padding(start = 10.dp, end = 50.dp),
+                modifier = Modifier.padding(start = 10.dp, end = 50.dp, bottom = 10.dp),
                 color = Color.Black
             )
-            Row(
-                modifier = Modifier.padding(bottom = 20.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.ThumbUp,
-                    contentDescription = "Like Comment",
-                    modifier = Modifier
-                        .padding(top = 10.dp, start = 10.dp)
-                )
-                Text(
-                    text = "1",
-                    modifier = Modifier.padding(start = 6.dp, top = 12.dp, end = 6.dp)
-                )
-                Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = "Dislike Comment",
-                    modifier = Modifier
-                        .padding(top = 10.dp)
-                )
-                Text(
-                    text = "2",
-                    modifier = Modifier.padding(start = 6.dp, top = 12.dp)
-                )
-            }
+//            Row(
+//                modifier = Modifier.padding(bottom = 20.dp)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Outlined.ThumbUp,
+//                    contentDescription = "Like Comment",
+//                    modifier = Modifier
+//                        .padding(top = 10.dp, start = 10.dp)
+//                )
+//                Text(
+//                    text = "1",
+//                    modifier = Modifier.padding(start = 6.dp, top = 12.dp, end = 6.dp)
+//                )
+//                Icon(
+//                    imageVector = Icons.Outlined.Delete,
+//                    contentDescription = "Dislike Comment",
+//                    modifier = Modifier
+//                        .padding(top = 10.dp)
+//                )
+//                Text(
+//                    text = "2",
+//                    modifier = Modifier.padding(start = 6.dp, top = 12.dp)
+//                )
+//            }
         }
     }
 }
