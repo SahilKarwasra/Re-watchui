@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -182,42 +180,6 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
             }
         }
 
-    }
-}
-
-@Composable
-fun VideoItem(index: Int) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.dumythumb),
-            contentDescription = "Thumbnail",
-            tint = Color.Unspecified,
-            modifier = Modifier
-                .padding(start = 9.dp, top = 30.dp)
-                .size(width = 200.dp, height = 100.dp)
-                .aspectRatio(2f)
-        )
-        Column {
-            Text(
-                text = "Pubg Chicken Dinner",
-                fontSize = 20.sp,
-                modifier = Modifier
-                    .padding(start = 5.dp, top = 30.dp)
-                    .fillMaxWidth(),
-                color = Color(0xFF6B7E8D),
-                maxLines = 4,
-            )
-            Text(
-                text = "Upload date",
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .padding(start = 5.dp)
-                    .align(Alignment.End),
-                color = Color(0xFF6B7E8D)
-            )
-        }
     }
 }
 

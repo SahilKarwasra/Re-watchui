@@ -39,6 +39,10 @@ class FirestoreViewModel : ViewModel() {
     private val _videoByUserList = MutableLiveData<List<Video>>()
     val userVideoList: LiveData<List<Video>> = _videoByUserList
 
+    private val _videoData_by_id = MutableLiveData<Video>()
+    val video_data_By_Id: LiveData<Video> = _videoData_by_id
+
+
     fun removeItem(indexToRemove: Int) {
         val currentList = _videoByUserList.value.orEmpty().toMutableList()
         if (indexToRemove in currentList.indices) {
@@ -234,6 +238,60 @@ class FirestoreViewModel : ViewModel() {
         })
 
     }
+
+    fun fetchVideoById(videoId: String) {
+        val videosRef = db.collection("videos")
+        val id = videoId
+        val usersRef = FirebaseDatabase.getInstance().getReference("users")
+        if(id.isNotEmpty()){
+            videosRef.document(id).get()
+                .addOnSuccessListener { document ->
+
+                    if (document != null && document.exists()) {
+                        val userId = document.getString("userId") ?: ""
+                        val videoUrl = document.getString("videoUrl") ?: ""
+                        val videoTitle = document.getString("title") ?: ""
+                        val videoDescription = document.getString("description") ?: ""
+                        val videoTags = document.get("videoTags") as? List<String> ?: emptyList()
+                        val likes = document.getString("like") ?: "0"
+                        val dislikes = document.getString("dislike") ?: "0"
+
+                        usersRef.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                val userDisplayName = dataSnapshot.child("displayName").getValue(String::class.java) ?: ""
+                                val userProfileImage = dataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
+                                val userProfileUrl = dataSnapshot.child("userProfileUrl").getValue(String::class.java) ?: ""
+
+                                val video = Video(
+                                    videoId,
+                                    userId,
+                                    userDisplayName,
+                                    videoUrl,
+                                    videoTitle,
+                                    videoDescription,
+                                    userProfileUrl,
+                                    userProfileImage,
+                                    videoTags,
+                                    likes,
+                                    dislikes
+                                )
+                                _videoData_by_id.value = video
+                            }
+
+                            override fun onCancelled(databaseError: DatabaseError) {
+                                Log.d("deepLink", "Error getting user data for video with ID $videoId: ${databaseError.message}")
+                            }
+                        })
+                        // Fetch user data from Realtime Database
+                        Log.d("deepLink","${userId}")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d("deepLink", "Error getting video with ID $videoId: $exception")
+                }
+        }
+    }
+
 
     fun fetchVideosByUserId(userId: String?) {
         val userId = userId ?: ""

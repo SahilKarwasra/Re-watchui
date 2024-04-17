@@ -3,11 +3,9 @@ package com.example.re_watch.navigation
 import VideoData
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.example.re_watch.screens.ChannelScreen
 import com.example.re_watch.screens.HomeScreen
@@ -54,16 +52,17 @@ fun AppNavigation() {
             ProfileScreen(navController = navController)
         }
         composable(route = "${AppScreens.StreamingPage.route}/{videoDataJson}",
-            arguments = listOf(
-                navArgument("videoDataJson") {
-                    type = NavType.StringType
-                }
-            )
+            deepLinks =
+            listOf(
+                navDeepLink {
+                    uriPattern = "https://rewatch.online/video/{videoId}"
+                }),
         ) { backStackEntry ->
 
             val videoData = Gson().fromJson(backStackEntry.arguments?.getString("videoDataJson") ?: "", VideoData::class.java)
-
-            StreamingPage(navController = navController, param = videoData)
+            val videoId = backStackEntry.arguments?.getString("videoId") ?: ""
+            val validDeeplink = videoId.isNotEmpty()
+            StreamingPage(navController = navController, videoIdByDeepLink = videoId, param = videoData, validDeeplink)
         }
         composable(AppScreens.LikedScreen.route) {
             LikedScreen(navController = navController)
@@ -74,17 +73,7 @@ fun AppNavigation() {
         composable(AppScreens.SettingScreen.route) {
             SettingsScreen(navController = navController)
         }
-        composable("${AppScreens.ChannelScreen.route}/{userId}",
-            deepLinks =
-            listOf(
-                navDeepLink {
-                uriPattern = "https://rewatch.com/user/{argument}"
-            }),
-        ){
-            val userId = it.arguments?.getString("userId") ?: ""
-            val userSlug = it.arguments?.getString("argument") ?: ""
-            ChannelScreen(navController = navController, userId = userId,userSlug)
-        }
+
         composable(
             route = "${AppScreens.ChannelScreen.route}/{userId}",
             deepLinks = listOf(

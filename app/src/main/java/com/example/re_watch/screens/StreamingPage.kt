@@ -42,6 +42,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,7 +62,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
@@ -74,6 +74,7 @@ import com.example.re_watch.Media
 import com.example.re_watch.MediaState
 import com.example.re_watch.R
 import com.example.re_watch.ShowBuffering
+import com.example.re_watch.Video
 import com.example.re_watch.components.CommentSection
 import com.example.re_watch.components.DescriptionBox
 import com.example.re_watch.components.PlayerControlViewController
@@ -90,218 +91,264 @@ private enum class ControllerType {
 }
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun StreamingPage(navController: NavHostController, param: VideoData?) {
+fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, param: VideoData?, ByLink :Boolean) {
     val commentViewModel: CommentViewModel = viewModel()
-    LaunchedEffect(Unit) {
-        Log.d("first", "comment get ")
+    val firestoreViewModel: FirestoreViewModel = viewModel()
 
-        commentViewModel.fetchComments()
+    var videoId: String = ""
+    var userId: String = ""
+    var title: String = ""
+    var description: String = ""
+    var displayName: String = ""
+    var userProfilePhoto: String = ""
+    var userProfileUrl: String = ""
+    var uri  = remember {
+        mutableStateOf("")
     }
-    val videoId = param?.videoId
-    val userId = param?.userID
-    val title = param?.videoTitle
-    val description = param?.videoDescription
-    val displayName = param?.userDisplayName
-    val userProfilePhoto = param?.userProfileImage
-    val userProfileUrl = param?.userProfileUrl
-    val uri = param?.videoUrl?.toUri()
-    val likes = param?.like
-    val dislike = param?.dislike
+    var likes: String = ""
+    var dislike: String = ""
 
 
+    val videoItem by firestoreViewModel.video_data_By_Id.observeAsState(initial =
+    Video("","","","",
+        "","","",
+        "", emptyList(),"",""))
+
+
+    LaunchedEffect(Unit) {
+//        Log.d("first", "comment get ")
+        Log.d("deepLink", "without deeplink get :  ${param?.videoId} ::: using deeplink ${videoIdByDeepLink} ")
+        firestoreViewModel.fetchVideoById(videoIdByDeepLink)
+//        commentViewModel.fetchComments()
+    }
+
+
+    if(ByLink){
+        videoId = videoItem.videoId
+        userId = videoItem.userId
+        title = videoItem.videoTitle
+        description = videoItem.videoDescription
+        displayName = videoItem.userDisplayName
+        userProfilePhoto = videoItem.userProfileImage
+        userProfileUrl = videoItem.userProfileUrl
+        uri.value = videoItem.videoUrl
+        likes = videoItem.likes
+        dislike = videoItem.dislikes
+    }else{
+        videoId = param?.videoId!!
+        userId = param.userID
+        title = param.videoTitle
+        description = param.videoDescription
+        displayName = param.userDisplayName
+        userProfilePhoto = param.userProfileImage
+        userProfileUrl = param.userProfileUrl
+        uri.value = param.videoUrl
+        likes = param.like
+        dislike = param.dislike
+    }
     var viewModel: FirestoreViewModel = viewModel()
     val likeDislikeViewModel: LikeDislikeViewModel = viewModel()
 
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
     val context = (LocalContext.current as? Activity) ?: return
-    currentUserId?.let { videoId?.let { it1 -> commentViewModel.getVideoAndUserId(it1, it) } }
-
+    currentUserId?.let { videoId.let { it1 -> commentViewModel.getVideoAndUserId(it1, it) } }
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    var setPlayer by rememberSaveable { mutableStateOf(true) }
-    var playWhenReady by rememberSaveable { mutableStateOf(true) }
-    var url by rememberSaveable { mutableStateOf(uri.toString()) }
+    if(uri.value.isNotEmpty()){
+        var setPlayer by rememberSaveable { mutableStateOf(true) }
+        var playWhenReady by rememberSaveable { mutableStateOf(true) }
+        var url by rememberSaveable { mutableStateOf(uri.value) }
 
-    val systemUiController = rememberSystemUiController()
-    SideEffect {
-        systemUiController.isStatusBarVisible = !isLandscape
-        systemUiController.isNavigationBarVisible = !isLandscape
-    }
-
-    var rememberedMediaItemIdAndPosition: Pair<String, Long>? by remember { mutableStateOf(null) }
-    val player by rememberManagedExoPlayer()
-    DisposableEffect(player, playWhenReady) {
-        player?.playWhenReady = playWhenReady
-        onDispose {}
-    }
-
-    val mediaItem = remember(url) { MediaItem.Builder().setMediaId(url).setUri(url).build() }
-    DisposableEffect(mediaItem, player) {
-        player?.run {
-            setMediaItem(mediaItem)
-            rememberedMediaItemIdAndPosition?.let { (id, position) ->
-                if (id == mediaItem.mediaId) seekTo(position)
-            }?.also { rememberedMediaItemIdAndPosition = null }
-            prepare()
+        val systemUiController = rememberSystemUiController()
+        SideEffect {
+            systemUiController.isStatusBarVisible = !isLandscape
+            systemUiController.isNavigationBarVisible = !isLandscape
         }
-        onDispose {}
-    }
 
-    val mediaState = rememberMediaState(player = player.takeIf { setPlayer })
-    val mediaContent = remember {
-        movableContentOf { isLandscape: Boolean, modifier: Modifier ->
-            MediaContent(mediaState, isLandscape, modifier)
+        var rememberedMediaItemIdAndPosition: Pair<String, Long>? by remember { mutableStateOf(null) }
+        val player by rememberManagedExoPlayer()
+        DisposableEffect(player, playWhenReady) {
+            player?.playWhenReady = playWhenReady
+            onDispose {}
         }
-    }
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding(),
-    ) { padding ->
-        if (!isLandscape) {
-            Column {
-                mediaContent(
-                    false,
-                    Modifier
-                        .padding(padding)
-                        .fillMaxWidth()
-                        .aspectRatio(16f / 9f)
-                )
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
 
-                        GlideImage(
-                            model = userProfilePhoto,
-                            contentDescription = "ProfilePic",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .size(70.dp)
-                                .clip(CircleShape)
-                                .clickable { navController.navigate(route = "${AppScreens.ChannelScreen.route}/${userId}") },
-                        )
-                        Column(
-                            modifier = Modifier.padding(start = 7.dp, top = 10.dp),
-                        ) {
-                            title?.let {
-                                Text(
-                                    text = it,
-                                    modifier = Modifier.padding(bottom = 5.dp),
-                                    maxLines = 2,
-                                    fontWeight = FontWeight(400),
-                                    fontSize = 16.sp
-                                )
-                            }
-                            displayName?.let {
-                                Text(
-                                    text = it,
-                                    maxLines = 1,
-                                    fontWeight = FontWeight(300),
-                                    fontSize = 16.sp
-                                )
-                            }
-                        }
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Spacer(modifier = Modifier.weight(1f))
-                        OutlinedButton(
-                            modifier = Modifier
-                                .padding(top = 7.dp)
-                                .width(100.dp)
-                                .height(45.dp)
-                                .clip(RoundedCornerShape(25.dp)),
-                            onClick = {
-                                videoId?.let {
-                                    currentUserId?.let { it1 ->
-                                        likeDislikeViewModel.likeVideo(
-                                            videoId = it,
-                                            userId = it1
-                                        )
-                                    }
-                                }
-                            }
+        val mediaItem = remember(url) { MediaItem.Builder().setMediaId(url).setUri(url).build() }
+        DisposableEffect(mediaItem, player) {
+            player?.run {
+                setMediaItem(mediaItem)
+                rememberedMediaItemIdAndPosition?.let { (id, position) ->
+                    if (id == mediaItem.mediaId) seekTo(position)
+                }?.also { rememberedMediaItemIdAndPosition = null }
+                prepare()
+            }
+            onDispose {}
+        }
 
-                        ) {
-                            Row {
-                                Icon(
-                                    imageVector = Icons.Outlined.Favorite,
-                                    contentDescription = "Like icon",
-                                    modifier = Modifier
-                                        .size(30.dp),
-                                    tint = Color.Red
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text =
-                                    (if (likeDislikeViewModel.likes.value.isNullOrEmpty()) {
-                                        likes
-                                    } else {
-                                        likeDislikeViewModel.likes.value
-                                    })!!,
-                                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
-                                    modifier = Modifier.padding(top = 5.dp),
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                            }
-                        }
-                        OutlinedButton(
-                            modifier = Modifier
-                                .padding(top = 7.dp)
-                                .width(100.dp)
-                                .height(45.dp)
-                                .clip(RoundedCornerShape(25.dp)),
-                            onClick = {
-                                currentUserId?.let {
-                                    videoId?.let { it1 ->
-                                        likeDislikeViewModel.dislikeVideo(
-                                            userId = it,
-                                            videoId = it1
-                                        )
-                                    }
-                                }
-                            }
-                        ) {
-                            Row {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Dislike Icon",
-                                    modifier = Modifier
-                                        .size(30.dp),
-                                    tint = Color.Gray
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text =
-                                    (if (likeDislikeViewModel.dislikes.value.isNullOrEmpty()) {
-                                        dislike
-                                    } else {
-                                        likeDislikeViewModel.dislikes.value
-                                    })!!,
-                                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
-                                    modifier = Modifier.padding(top = 5.dp),
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                            }
-                        }
-                    }
-                    DescriptionBox(description = description.toString())
-                    CommentSection(commentViewModel = commentViewModel)
-                }
-
+        val mediaState = rememberMediaState(player = player.takeIf { setPlayer })
+        val mediaContent = remember {
+            movableContentOf { isLandscape: Boolean, modifier: Modifier ->
+                MediaContent(mediaState, isLandscape, modifier)
             }
         }
-    }
-    if (isLandscape) {
-        mediaContent(
-            true,
-            Modifier
+        Scaffold(
+            modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
-        )
+                .systemBarsPadding(),
+        ) { padding ->
+            if (!isLandscape) {
+                Column {
+                    if(uri.value.isNotEmpty()){
+                        Log.d("uri","${uri.value}")
+                        mediaContent(
+                            false,
+                            Modifier
+                                .padding(padding)
+                                .fillMaxWidth()
+                                .aspectRatio(16f / 9f)
+                        )
+                    }
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+
+                            GlideImage(
+                                model = userProfilePhoto,
+                                contentDescription = "ProfilePic",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .padding(5.dp)
+                                    .size(70.dp)
+                                    .clip(CircleShape)
+                                    .clickable { navController.navigate(route = "${AppScreens.ChannelScreen.route}/${userId}") },
+                            )
+                            Column(
+                                modifier = Modifier.padding(start = 7.dp, top = 10.dp),
+                            ) {
+                                title?.let {
+                                    Text(
+                                        text = it,
+                                        modifier = Modifier.padding(bottom = 5.dp),
+                                        maxLines = 2,
+                                        fontWeight = FontWeight(400),
+                                        fontSize = 16.sp
+                                    )
+                                }
+                                displayName?.let {
+                                    Text(
+                                        text = it,
+                                        maxLines = 1,
+                                        fontWeight = FontWeight(300),
+                                        fontSize = 16.sp
+                                    )
+                                }
+                            }
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Spacer(modifier = Modifier.weight(1f))
+                            OutlinedButton(
+                                modifier = Modifier
+                                    .padding(top = 7.dp)
+                                    .width(100.dp)
+                                    .height(45.dp)
+                                    .clip(RoundedCornerShape(25.dp)),
+                                onClick = {
+                                    videoId?.let {
+                                        currentUserId?.let { it1 ->
+                                            likeDislikeViewModel.likeVideo(
+                                                videoId = it,
+                                                userId = it1
+                                            )
+                                        }
+                                    }
+                                }
+
+                            ) {
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Favorite,
+                                        contentDescription = "Like icon",
+                                        modifier = Modifier
+                                            .size(30.dp),
+                                        tint = Color.Red
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text =
+                                        (if (likeDislikeViewModel.likes.value.isNullOrEmpty()) {
+                                            likes
+                                        } else {
+                                            likeDislikeViewModel.likes.value
+                                        })!!,
+                                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                                        modifier = Modifier.padding(top = 5.dp),
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            }
+                            OutlinedButton(
+                                modifier = Modifier
+                                    .padding(top = 7.dp)
+                                    .width(100.dp)
+                                    .height(45.dp)
+                                    .clip(RoundedCornerShape(25.dp)),
+                                onClick = {
+                                    currentUserId?.let {
+                                        videoId?.let { it1 ->
+                                            likeDislikeViewModel.dislikeVideo(
+                                                userId = it,
+                                                videoId = it1
+                                            )
+                                        }
+                                    }
+                                }
+                            ) {
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Dislike Icon",
+                                        modifier = Modifier
+                                            .size(30.dp),
+                                        tint = Color.Gray
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text =
+                                        (if (likeDislikeViewModel.dislikes.value.isNullOrEmpty()) {
+                                            dislike
+                                        } else {
+                                            likeDislikeViewModel.dislikes.value
+                                        })!!,
+                                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                                        modifier = Modifier.padding(top = 5.dp),
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            }
+                        }
+                        DescriptionBox(description = description.toString())
+                        CommentSection(commentViewModel = commentViewModel)
+                    }
+
+                }
+            }
+        }
+        if (isLandscape) {
+            if(uri.value.isNotEmpty()){
+                mediaContent(
+                    true,
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                )
+            }
+        }
+    } else {
+        Box(Modifier.fillMaxSize(), Alignment.Center) {
+            CircularProgressIndicator()
+        }
     }
 }
 @Composable
