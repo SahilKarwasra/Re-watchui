@@ -2,6 +2,8 @@ package com.example.re_watch.screens
 
 import VideoData
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
@@ -29,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -62,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
@@ -225,25 +229,24 @@ fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, p
                             Column(
                                 modifier = Modifier.padding(start = 7.dp, top = 10.dp),
                             ) {
-                                title?.let {
-                                    Text(
-                                        text = it,
-                                        modifier = Modifier.padding(bottom = 5.dp),
-                                        maxLines = 2,
-                                        fontWeight = FontWeight(400),
-                                        fontSize = 16.sp
-                                    )
-                                }
-                                displayName?.let {
-                                    Text(
-                                        text = it,
-                                        maxLines = 1,
-                                        fontWeight = FontWeight(300),
-                                        fontSize = 16.sp
-                                    )
-                                }
+                                Text(
+                                    text = title,
+                                    modifier = Modifier.padding(bottom = 5.dp),
+                                    maxLines = 2,
+                                    fontWeight = FontWeight(400),
+                                    fontSize = 16.sp
+                                )
+                                Text(
+                                    text = displayName,
+                                    maxLines = 1,
+                                    fontWeight = FontWeight(300),
+                                    fontSize = 16.sp
+                                )
                             }
+                            Share(text = "https://rewatch.online/video/${videoId}", context = context, modifier = Modifier.fillMaxWidth().align(Alignment.CenterVertically))
+
                         }
+
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -296,7 +299,7 @@ fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, p
                                     .clip(RoundedCornerShape(25.dp)),
                                 onClick = {
                                     currentUserId?.let {
-                                        videoId?.let { it1 ->
+                                        videoId.let { it1 ->
                                             likeDislikeViewModel.dislikeVideo(
                                                 userId = it,
                                                 videoId = it1
@@ -349,6 +352,18 @@ fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, p
         Box(Modifier.fillMaxSize(), Alignment.Center) {
             CircularProgressIndicator()
         }
+    }
+}
+
+@Composable
+fun Share(text: String, context: Context , modifier: Modifier) {
+    val sendIntent = Intent(Intent.ACTION_SEND).apply {
+        putExtra(Intent.EXTRA_TEXT, text)
+        type = "text/plain"
+    }
+    val shareIntent = Intent.createChooser(sendIntent, null)
+    Box(modifier = modifier){
+        Icon(imageVector = Icons.Outlined.Share, contentDescription = null, Modifier.clickable {  startActivity(context, shareIntent, null) }.align(Alignment.CenterEnd).padding(end = 10.dp).size(30.dp))
     }
 }
 @Composable

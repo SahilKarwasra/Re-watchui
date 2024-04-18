@@ -44,7 +44,7 @@ class UserDetailViewModel : ViewModel() {
                 val userDataSnapshot = dataSnapshot.child(userIdget.value)
                 val userDisplayName = userDataSnapshot.child("displayName").getValue(String::class.java) ?: ""
                 val userProfileImage = userDataSnapshot.child("profileImage").getValue(String::class.java) ?: ""
-                val userProfileUrl = userDataSnapshot.child("userProfileUrl").getValue(String::class.java) ?: ""
+                val userProfileUrl = userDataSnapshot.child("profileUrl").getValue(String::class.java) ?: ""
 
                 userDetails.value = UserDetails(userIdget.value,userDisplayName,userProfileUrl, userProfileImage)
             }
