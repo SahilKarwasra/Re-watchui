@@ -232,7 +232,7 @@ fun InputCommentTextField(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .padding(10.dp)
-                .size(45.dp)
+                .size(55.dp)
                 .clip(CircleShape),
 
             )
@@ -281,7 +281,7 @@ fun CommentItemRow(commentItem: Comment) {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .padding(start = 10.dp, top = 10.dp)
-                .size(30.dp)
+                .size(45.dp)
                 .clip(CircleShape),
 
             )
@@ -292,7 +292,8 @@ fun CommentItemRow(commentItem: Comment) {
                 Text(
                     text = "@${commentItem.userName}",
                     modifier = Modifier.padding(start = 10.dp, top = 10.dp),
-                    color = Color.Gray
+                    color = Color.Gray,
+                    fontSize = 16.sp
                 )
                 Box(
                     modifier = Modifier.fillMaxWidth(),
@@ -304,6 +305,10 @@ fun CommentItemRow(commentItem: Comment) {
                         modifier = Modifier
                             .padding(top = 7.dp, end = 20.dp)
                             .size(25.dp)
+                            .clickable {
+
+                            }
+
                     )
                 }
             }

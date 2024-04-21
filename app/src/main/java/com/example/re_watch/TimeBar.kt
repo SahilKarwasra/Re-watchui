@@ -155,18 +155,6 @@ fun TimeBar(
     }
 }
 
-/**
- * The default progress composable component for [TimeBar].
- *
- * @param played The played progress.
- * @param buffered The buffered progress.
- * @param modifier The [Modifier] to be applied to this layout node.
- * @param playedColor Color for the portion of the time bar representing media before the current
- * playback position.
- * @param bufferedColor  Color for the portion of the time bar after the current played position up
- * to the current buffered position.
- * @param playedColor Color for the portion of the time bar after the current buffered position.
- */
 @Composable
 fun TimeBarProgress(
     played: Float,
