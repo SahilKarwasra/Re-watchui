@@ -118,14 +118,14 @@ class SignUpViewModel() : ViewModel() {
                                 displayName = displayName,
                                 email = it,
                                 profileUrl = "@${profileUserName.lowercase()}",
-                                profileImage = user.photoUrl.toString()
+                                profileImage = "https://rewatch.online/user.jpg"
                             )
                         }
 
                         userId?.let { userData?.let { it1 -> saveUserData(userId = it, it1) } }
                         val profileUpdates = UserProfileChangeRequest.Builder()
                             .setDisplayName(displayName)
-                            .setPhotoUri(Uri.parse("http://images.com/1.jpg"))
+                            .setPhotoUri(Uri.parse("https://rewatch.online/user.jpg"))
                             .build()
 
                         user?.updateProfile(profileUpdates)
