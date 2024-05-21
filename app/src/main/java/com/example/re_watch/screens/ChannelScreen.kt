@@ -191,7 +191,7 @@ fun ChannelScreen(navController: NavHostController, userId: String, userSlug: St
                     AdvancedVideoCard(username = video.userProfileUrl, title = video.videoTitle, videoUrl = video.videoUrl, onDeleteClicked ={} , remove = false, onEditClicked = {}) {
                         Log.e("user", "${video.userProfileUrl}")
                         val videoDataJson = Gson().toJson(videoData)
-                        navController.navigate(route = "${AppScreens.StreamingPage.route}/$videoDataJson")
+                        navController.navigate(route = "${AppScreens.AinimationStream.route}/$videoDataJson")
                     }
 
                 }

@@ -90,8 +90,8 @@ fun AppNavigation() {
         composable(AppScreens.RemoveScreen.route) {
             RemoveVideoScreen(navController = navController)
         }
-        composable("${AppScreens.AinimationStream.route}/{videoDataJsons}"){
-            val videoData = it.arguments?.getString("videoDataJsons") ?: ""
+        composable("${AppScreens.AinimationStream.route}/{videoDataJson}"){
+            val videoData = it.arguments?.getString("videoDataJson") ?: ""
             openStreamingPage(navController,videoData)
         }
 

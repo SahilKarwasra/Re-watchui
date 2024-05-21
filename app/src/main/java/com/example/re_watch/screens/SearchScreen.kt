@@ -154,7 +154,7 @@ fun SearchScreen(navController: NavHostController) {
                             )
 
                         val videoDataJson = Gson().toJson(videodata)
-                        navController.navigate(route = "${AppScreens.StreamingPage.route}/$videoDataJson")
+                        navController.navigate(route = "${AppScreens.AinimationStream.route}/$videoDataJson")
                     })
                 }
             }

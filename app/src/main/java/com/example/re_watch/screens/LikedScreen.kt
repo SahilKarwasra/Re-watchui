@@ -144,7 +144,7 @@ fun LikedScreen(navController: NavHostController) {
                             )
 
                         val videoDataJson = Gson().toJson(videoData)
-                        navController.navigate(route = "${AppScreens.StreamingPage.route}/$videoDataJson")
+                        navController.navigate(route = "${AppScreens.AinimationStream.route}/$videoDataJson")
 
 
                     })

@@ -3,10 +3,6 @@ package com.example.re_watch.screens
 import VideoData
 import android.net.Uri
 import android.util.Log
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -33,9 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -148,8 +141,8 @@ fun HomeScreen(navController: NavHostController) {
                                 dislike = video.dislikes
                             )
 
-                        val videoDataJsons = Gson().toJson(videodata)
-                        navController.navigate(route = "${AppScreens.AinimationStream.route}/$videoDataJsons")
+                        val videoDataJson = Gson().toJson(videodata)
+                        navController.navigate(route = "${AppScreens.AinimationStream.route}/$videoDataJson")
 
 
                     })
@@ -163,38 +156,7 @@ fun HomeScreen(navController: NavHostController) {
 }
 
 
-@Composable
-fun openStreamingPage(navController: NavHostController, videoDataJson: String) {
-    var openVideo by rememberSaveable { mutableStateOf(false) }
 
-    // Use a LaunchedEffect to trigger the animation after composition
-    LaunchedEffect(Unit) {
-        openVideo = true
-    }
-
-    // Use a slide animation to animate the StreamingPage in and out
-    AnimatedVisibility(
-        visible = openVideo,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it }),
-    ) {
-        StreamingPage(
-            navController = navController,
-            videoIdByDeepLink = "",
-            param = Gson().fromJson(videoDataJson, VideoData::class.java),
-            ByLink = false,
-//            modifier = Modifier.statusBarsPadding()
-        )
-    }
-
-    // Intercept the back button press to close the StreamingPage
-    BackHandler(
-        onBack = {
-            openVideo = false
-            navController.popBackStack()
-        }
-    )
-}
 
 
 @Composable

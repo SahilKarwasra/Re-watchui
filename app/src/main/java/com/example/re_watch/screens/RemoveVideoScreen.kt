@@ -122,7 +122,7 @@ fun RemoveVideoScreen(navController: NavHostController) {
                     remove = true, onEditClicked = {}) {
 
                     val videoDataJson = Gson().toJson(videoData)
-                    navController.navigate(route = "${AppScreens.StreamingPage.route}/$videoDataJson")
+                    navController.navigate(route = "${AppScreens.AinimationStream.route}/$videoDataJson")
                 }
 
             }

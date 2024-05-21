@@ -10,7 +10,11 @@ import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
 import android.content.res.Configuration
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -89,6 +93,7 @@ import com.example.re_watch.rememberMediaState
 import com.example.re_watch.utils.findActivity
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
 
 private enum class ControllerType {
     None, Simple, PlayerControlView
@@ -489,7 +494,38 @@ private fun MediaContent(
 
 
 
+@Composable
+fun openStreamingPage(navController: NavHostController, videoDataJson: String) {
+    var openVideo by rememberSaveable { mutableStateOf(false) }
 
+    // Use a LaunchedEffect to trigger the animation after composition
+    LaunchedEffect(Unit) {
+        openVideo = true
+    }
+
+    // Use a slide animation to animate the StreamingPage in and out
+    AnimatedVisibility(
+        visible = openVideo,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+    ) {
+        StreamingPage(
+            navController = navController,
+            videoIdByDeepLink = "",
+            param = Gson().fromJson(videoDataJson, VideoData::class.java),
+            ByLink = false,
+//            modifier = Modifier.statusBarsPadding()
+        )
+    }
+
+    // Intercept the back button press to close the StreamingPage
+    BackHandler(
+        onBack = {
+            openVideo = false
+            navController.popBackStack()
+        }
+    )
+}
 
 
 
