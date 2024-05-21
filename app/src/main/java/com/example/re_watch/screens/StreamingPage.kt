@@ -101,7 +101,7 @@ private enum class ControllerType {
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, param: VideoData?, ByLink :Boolean) {
-    val commentViewModel: CommentViewModel = viewModel()
+    var commentViewModel: CommentViewModel = viewModel()
     val firestoreViewModel: FirestoreViewModel = viewModel()
 
     var videoId: String = ""
@@ -127,8 +127,13 @@ fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, p
     LaunchedEffect(Unit) {
 //        Log.d("first", "comment get ")
         Log.d("deepLink", "without deeplink get :  ${param?.videoId} ::: using deeplink ${videoIdByDeepLink} ")
-        firestoreViewModel.fetchVideoById(videoIdByDeepLink)
-        commentViewModel.fetchComments()
+
+        if(ByLink){
+            firestoreViewModel.fetchVideoById(videoIdByDeepLink,commentViewModel)
+            commentViewModel = firestoreViewModel.commentViewModel_bylink
+        }else{
+            commentViewModel.fetchComments()
+        }
     }
 
 

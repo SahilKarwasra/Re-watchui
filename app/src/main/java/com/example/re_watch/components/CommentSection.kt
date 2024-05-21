@@ -280,8 +280,8 @@ fun CommentItemRow(commentItem: Comment) {
             contentDescription = "ProfilePic",
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .size(45.dp)
+                .padding(start = 10.dp, top = 15.dp)
+                .size(30.dp)
                 .clip(CircleShape),
 
             )
@@ -303,7 +303,7 @@ fun CommentItemRow(commentItem: Comment) {
                         imageVector = Icons.Outlined.MoreVert,
                         contentDescription = "Edit Comment",
                         modifier = Modifier
-                            .padding(top = 7.dp, end = 20.dp)
+                            .padding(top = 15.dp, end = 20.dp)
                             .size(25.dp)
                             .clickable {
 

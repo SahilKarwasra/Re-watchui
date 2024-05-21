@@ -42,6 +42,9 @@ class FirestoreViewModel : ViewModel() {
     private val _videoData_by_id = MutableLiveData<Video>()
     val video_data_By_Id: LiveData<Video> = _videoData_by_id
 
+    public var commentViewModel_bylink = CommentViewModel()
+
+
 
     fun removeItem(indexToRemove: Int) {
         val currentList = _videoByUserList.value.orEmpty().toMutableList()
@@ -239,7 +242,7 @@ class FirestoreViewModel : ViewModel() {
 
     }
 
-    fun fetchVideoById(videoId: String) {
+    fun fetchVideoById(videoId: String, commentViewModel: CommentViewModel) {
         val videosRef = db.collection("videos")
         val id = videoId
         val usersRef = FirebaseDatabase.getInstance().getReference("users")
@@ -255,6 +258,10 @@ class FirestoreViewModel : ViewModel() {
                         val videoTags = document.get("videoTags") as? List<String> ?: emptyList()
                         val likes = document.getString("like") ?: "0"
                         val dislikes = document.getString("dislike") ?: "0"
+
+                        commentViewModel.getVideoAndUserId(videoId,userId)
+                        commentViewModel.fetchComments()
+                        commentViewModel_bylink = commentViewModel
 
                         usersRef.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -281,6 +288,7 @@ class FirestoreViewModel : ViewModel() {
                             override fun onCancelled(databaseError: DatabaseError) {
                                 Log.d("deepLink", "Error getting user data for video with ID $videoId: ${databaseError.message}")
                             }
+
                         })
                         // Fetch user data from Realtime Database
                         Log.d("deepLink","${userId}")
