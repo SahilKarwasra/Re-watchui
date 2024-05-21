@@ -18,6 +18,7 @@ import com.example.re_watch.screens.SettingsScreen
 import com.example.re_watch.screens.SignUpScreen
 import com.example.re_watch.screens.StreamingPage
 import com.example.re_watch.screens.WelcomeScreen
+import com.example.re_watch.screens.openStreamingPage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 
@@ -88,6 +89,10 @@ fun AppNavigation() {
         }
         composable(AppScreens.RemoveScreen.route) {
             RemoveVideoScreen(navController = navController)
+        }
+        composable("${AppScreens.AinimationStream.route}/{videoDataJsons}"){
+            val videoData = it.arguments?.getString("videoDataJsons") ?: ""
+            openStreamingPage(navController,videoData)
         }
 
 

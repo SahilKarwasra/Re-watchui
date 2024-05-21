@@ -176,6 +176,7 @@ fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, p
             onDispose {}
         }
 
+
         val mediaItem = remember(url) { MediaItem.Builder().setMediaId(url).setUri(url).build() }
         DisposableEffect(mediaItem, player) {
             player?.run {
@@ -243,7 +244,9 @@ fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, p
                                     fontSize = 16.sp
                                 )
                             }
-                            Share(text = "https://rewatch.online/video/${videoId}", context = context, modifier = Modifier.fillMaxWidth().align(Alignment.CenterVertically))
+                            Share(text = "https://rewatch.online/video/${videoId}", context = context, modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterVertically))
 
                         }
 
@@ -348,11 +351,13 @@ fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, p
                 )
             }
         }
+
     } else {
         Box(Modifier.fillMaxSize(), Alignment.Center) {
             CircularProgressIndicator()
         }
     }
+
 }
 
 @Composable
@@ -363,7 +368,12 @@ fun Share(text: String, context: Context , modifier: Modifier) {
     }
     val shareIntent = Intent.createChooser(sendIntent, null)
     Box(modifier = modifier){
-        Icon(imageVector = Icons.Outlined.Share, contentDescription = null, Modifier.clickable {  startActivity(context, shareIntent, null) }.align(Alignment.CenterEnd).padding(end = 10.dp).size(30.dp))
+        Icon(imageVector = Icons.Outlined.Share, contentDescription = null,
+            Modifier
+                .clickable { startActivity(context, shareIntent, null) }
+                .align(Alignment.CenterEnd)
+                .padding(end = 10.dp)
+                .size(30.dp))
     }
 }
 @Composable
@@ -448,6 +458,7 @@ private fun MediaContent(
             }
         }
     }
+
 
     val onBackPressedDispatcher = checkNotNull(LocalOnBackPressedDispatcherOwner.current){
         "no owner dispatcher provided"
