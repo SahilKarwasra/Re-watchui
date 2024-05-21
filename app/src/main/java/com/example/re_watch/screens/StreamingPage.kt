@@ -123,7 +123,7 @@ fun StreamingPage(navController: NavHostController, videoIdByDeepLink: String, p
 //        Log.d("first", "comment get ")
         Log.d("deepLink", "without deeplink get :  ${param?.videoId} ::: using deeplink ${videoIdByDeepLink} ")
         firestoreViewModel.fetchVideoById(videoIdByDeepLink)
-//        commentViewModel.fetchComments()
+        commentViewModel.fetchComments()
     }
 
 
