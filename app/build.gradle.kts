@@ -109,6 +109,7 @@ dependencies {
     implementation("androidx.media3:media3-common:1.3.1")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.27.1")
 
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
 
 
 

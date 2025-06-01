@@ -108,9 +108,9 @@ fun LikedScreen(navController: NavHostController) {
                 )
         },
         floatingActionButton = {
-            FloatingProfileButton {
-                navController.navigate(route = AppScreens.ProfileScreen.route)
-            }
+//            FloatingProfileButton {
+//                navController.navigate(route = AppScreens.ProfileScreen.route)
+//            }
         }
     ) {
         Surface(modifier = Modifier
@@ -153,10 +153,4 @@ fun LikedScreen(navController: NavHostController) {
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun LikedScreenPreview() {
-    LikedScreen(navController = rememberNavController())
 }

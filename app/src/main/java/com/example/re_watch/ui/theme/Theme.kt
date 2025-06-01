@@ -10,38 +10,63 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = DarkBluePrimary,
+    onPrimary = DarkOnPrimary,
+    primaryContainer = DarkBluePrimaryVariant,
+    onPrimaryContainer = DarkOnBackground,
+    secondary = DarkBlueSecondary,
+    onSecondary = DarkOnSecondary,
+    secondaryContainer = DarkBlueSecondaryVariant,
+    onSecondaryContainer = DarkOnBackground,
+    tertiary = DarkBlueAccent,
+    onTertiary = DarkOnSecondary,
+    background = DarkBackground,
+    onBackground = DarkOnBackground,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurface,
+    onSurfaceVariant = DarkOnSurface,
+    error = DarkError,
+    onError = DarkOnPrimary,
+    outline = DividerColor,
+    outlineVariant = ShimmerColor
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = BluePrimary,
+    onPrimary = LightOnPrimary,
+    primaryContainer = BluePrimaryVariant,
+    onPrimaryContainer = LightOnPrimary,
+    secondary = BlueSecondary,
+    onSecondary = LightOnSecondary,
+    secondaryContainer = BlueSecondaryVariant,
+    onSecondaryContainer = LightOnSecondary,
+    tertiary = BlueAccent,
+    onTertiary = LightOnSecondary,
+    background = LightBackground,
+    onBackground = LightOnBackground,
+    surface = LightSurface,
+    onSurface = LightOnSurface,
+    surfaceVariant = LightSurface,
+    onSurfaceVariant = LightOnSurface,
+    error = LightError,
+    onError = LightOnPrimary,
+    outline = DividerColor,
+    outlineVariant = ShimmerColor
 )
 
 @Composable
 fun RewatchTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // Disabled to use our custom blue theme
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -49,16 +74,23 @@ fun RewatchTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+    
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            // Set status bar color to transparent for edge-to-edge
+            window.statusBarColor = Color.Transparent.toArgb()
+            window.navigationBarColor = Color.Transparent.toArgb()
+            
+            // Configure system bars appearance
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !darkTheme
+                isAppearanceLightNavigationBars = !darkTheme
+            }
         }
     }
 
